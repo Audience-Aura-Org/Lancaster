@@ -1,39 +1,73 @@
+<%# Shared header for every public page: topbar, desktop menu, and the slide-in mobile menu. %>
+<%
+  const _petServices = Object.values(domain.SERVICE_TYPES).filter((s) => s.category === 'pet' && !s.retired);
+  const _here = (locals.path || '/');
+  const _is = (href) => href === '/' ? (_here === '/' || _here === '/index.html') : _here === href;
+  const _svcActive = _here === '/service.html' || _here === '/pet-transport.html' || _petServices.some((s) => _here === '/' + s.slug + '.html');
+%>
+<div class="topbar">
+  <div class="container"><div class="row align-items-center">
+    <div class="col-lg-9 col-md-8"><div class="topbar-contact-info"><ul>
+      <li><a href="/locations.html"><i class="fa-solid fa-location-dot"></i> Where we travel</a></li>
+      <li><a class="topbar-contact-link" href="mailto:<%= business.email %>"><i class="fa-solid fa-envelope"></i><span><strong>Email Our Team</strong> <%= business.email %></span></a></li>
+    </ul></div></div>
+    <div class="col-lg-3 col-md-4"><div class="topbar-social-links"><ul>
+      <li><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
+      <li><a href="#" aria-label="X"><i class="fa-brands fa-twitter"></i></a></li>
+      <li><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
+    </ul></div></div>
+  </div></div>
+</div>
 
-            <div class="topbar">
-                <div class="container"><div class="row align-items-center">
-                    <div class="col-lg-9 col-md-8"><div class="topbar-contact-info"><ul>
-                        <li><a href="locations.html"><i class="fa-solid fa-location-dot"></i> Global Locations</a></li>
-                        <li><a class="topbar-contact-link" href="mailto:<%= business.email %>"><i class="fa-solid fa-envelope"></i><span><strong>Email Our Team</strong> <%= business.email %></span></a></li>
-                    </ul></div></div>
-                    <div class="col-lg-3 col-md-4"><div class="topbar-social-links"><ul>
-                        <li><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
-                        <li><a href="#" aria-label="X"><i class="fa-brands fa-twitter"></i></a></li>
-                        <li><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
-                    </ul></div></div>
-                </div></div>
-            </div>
-            <header class="main-header"><div class="header-sticky"><nav class="navbar navbar-expand-lg"><div class="container">
-                <a class="navbar-brand" href="/" aria-label="<%= business.name %> home"><span class="brand-mark"><span class="brand-initials" aria-hidden="true"><i class="fa-solid fa-paw"></i></span><span class="brand-name">Lancaster <small>Pet Movers</small></span></span></a>
-                <div class="collapse navbar-collapse main-menu"><ul class="navbar-nav mr-auto" id="menu">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="about-us.html">About Us</a></li>
-                    <li class="nav-item has-submenu"><a class="nav-link" href="service.html">Services</a><ul class="sub-menu">
-                        <li class="nav-item"><a class="nav-link" href="ocean-freight.html">Ocean Freight</a></li>
-                        <li class="nav-item"><a class="nav-link" href="air-freight.html">Air Freight</a></li>
-                        <li class="nav-item"><a class="nav-link" href="cargo-freight.html">Cargo Freight</a></li>
-                        <li class="nav-item"><a class="nav-link" href="express-delivery.html">Express Delivery</a></li>
-                        <li class="nav-item"><a class="nav-link" href="customs-clearance.html">Customs Clearance</a></li>
-                        <li class="nav-item"><a class="nav-link" href="project-cargo.html">Project Cargo</a></li>
-                        <li class="nav-item"><a class="nav-link" href="pet-transport.html">Pet Transport</a></li>
-                    </ul></li>
-                    <li class="nav-item"><a class="nav-link" href="reviews.html">Reviews</a></li>
-                    <li class="nav-item"><a class="nav-link" href="locations.html">Locations</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/track">Track</a></li>
-                    <li class="nav-item has-submenu"><a class="nav-link" href="pet-transport.html">Pet Delivery</a><ul class="sub-menu">
-                        <li class="nav-item"><a class="nav-link" href="pet-transport.html">Pet Transport</a></li>
-                        <li class="nav-item"><a class="nav-link" href="faqs.html">FAQs</a></li>
-                    </ul></li>
-                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
-                </ul></div>
-                <div class="navbar-toggle"></div>
-            </div></nav><div class="responsive-menu"></div></div></header>
+<header class="main-header"><div class="header-sticky"><nav class="navbar navbar-expand-lg"><div class="container">
+  <a class="navbar-brand" href="/" aria-label="<%= business.name %> home"><span class="brand-mark"><span class="brand-initials" aria-hidden="true"><i class="fa-solid fa-paw"></i></span><span class="brand-name">Lancaster <small>Pet Movers</small></span></span></a>
+
+  <div class="collapse navbar-collapse main-menu"><ul class="navbar-nav mr-auto" id="site-menu">
+    <li class="nav-item"><a class="nav-link<%= _is('/') ? ' is-active' : '' %>" href="/">Home</a></li>
+    <li class="nav-item"><a class="nav-link<%= _is('/about-us.html') ? ' is-active' : '' %>" href="/about-us.html">About Us</a></li>
+    <li class="nav-item has-submenu"><a class="nav-link<%= _svcActive ? ' is-active' : '' %>" href="/service.html">Services</a><ul class="sub-menu">
+      <li class="nav-item"><a class="nav-link" href="/pet-transport.html">Pet Transport Overview</a></li>
+      <% _petServices.forEach((s) => { %><li class="nav-item"><a class="nav-link" href="/<%= s.slug %>.html"><%= s.label %></a></li><% }) %>
+    </ul></li>
+    <li class="nav-item"><a class="nav-link<%= _is('/reviews.html') ? ' is-active' : '' %>" href="/reviews.html">Reviews</a></li>
+    <li class="nav-item"><a class="nav-link<%= _is('/track') ? ' is-active' : '' %>" href="/track">Track</a></li>
+    <li class="nav-item"><a class="nav-link<%= _is('/faqs.html') ? ' is-active' : '' %>" href="/faqs.html">FAQs</a></li>
+    <li class="nav-item"><a class="nav-link<%= _is('/contact.html') ? ' is-active' : '' %>" href="/contact.html">Contact</a></li>
+  </ul></div>
+
+  <a class="btn-default lpm-header-cta" href="/quote">Get a Quote</a>
+  <button class="lpm-menu-btn" type="button" aria-controls="lpm-drawer" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button>
+</div></nav></div></header>
+
+<!-- Mobile menu -->
+<div class="lpm-drawer-backdrop" data-menu-close hidden></div>
+<aside class="lpm-drawer" id="lpm-drawer" aria-label="Menu" aria-hidden="true" tabindex="-1">
+  <div class="lpm-drawer-head">
+    <a href="/" class="brand-mark"><span class="brand-initials" aria-hidden="true"><i class="fa-solid fa-paw"></i></span><span class="brand-name">Lancaster <small>Pet Movers</small></span></a>
+    <button class="lpm-drawer-close" type="button" data-menu-close aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <nav class="lpm-drawer-nav" aria-label="Mobile">
+    <a href="/" class="<%= _is('/') ? 'is-active' : '' %>"><i class="fa-solid fa-house"></i> Home</a>
+    <a href="/about-us.html" class="<%= _is('/about-us.html') ? 'is-active' : '' %>"><i class="fa-solid fa-heart"></i> About Us</a>
+    <button type="button" class="lpm-drawer-group<%= _svcActive ? ' is-active' : '' %>" aria-expanded="<%= _svcActive ? 'true' : 'false' %>" aria-controls="lpm-drawer-services"><i class="fa-solid fa-paw"></i> Services <i class="fa-solid fa-chevron-down lpm-chevron"></i></button>
+    <div class="lpm-drawer-sub" id="lpm-drawer-services" <%= _svcActive ? '' : 'hidden' %>>
+      <a href="/service.html">All services</a>
+      <a href="/pet-transport.html">Pet Transport Overview</a>
+      <% _petServices.forEach((s) => { %><a href="/<%= s.slug %>.html"><%= s.label %></a><% }) %>
+    </div>
+    <a href="/reviews.html" class="<%= _is('/reviews.html') ? 'is-active' : '' %>"><i class="fa-solid fa-star"></i> Reviews</a>
+    <a href="/locations.html" class="<%= _is('/locations.html') ? 'is-active' : '' %>"><i class="fa-solid fa-earth-americas"></i> Where we travel</a>
+    <a href="/track" class="<%= _is('/track') ? 'is-active' : '' %>"><i class="fa-solid fa-location-crosshairs"></i> Track a pet</a>
+    <a href="/faqs.html" class="<%= _is('/faqs.html') ? 'is-active' : '' %>"><i class="fa-solid fa-circle-question"></i> FAQs</a>
+    <a href="/contact.html" class="<%= _is('/contact.html') ? 'is-active' : '' %>"><i class="fa-solid fa-envelope"></i> Contact</a>
+  </nav>
+  <div class="lpm-drawer-cta">
+    <a class="btn-default" href="/quote">Get a free quote</a>
+    <a class="lpm-drawer-track" href="/track"><i class="fa-solid fa-magnifying-glass"></i> Track my pet</a>
+  </div>
+  <div class="lpm-drawer-contact">
+    <a href="mailto:<%= business.email %>"><i class="fa-solid fa-envelope"></i> <%= business.email %></a>
+    <% if (business.phone) { %><a href="tel:<%= business.phone.replace(/[^\d+]/g, '') %>"><i class="fa-solid fa-phone"></i> <%= business.phone %></a><% } %>
+  </div>
+</aside>
+<script src="/js/site-menu.js" defer></script>

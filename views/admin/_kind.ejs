@@ -1,1 +1,1 @@
-<% const _k = domain.kindOf(kindService) || 'pet'; const _K = domain.SHIPMENT_KINDS[_k]; %><span class="kind-pill kind-<%= _k %><%= locals.kindSmall ? ' is-small' : '' %>" title="<%= _K.label %>"><i class="fa-solid <%= _K.icon %>" aria-hidden="true"></i> <%= _K.short %></span>
+<% if (domain.isFreight(kindService)) { %><span class="kind-pill kind-freight<%= locals.kindSmall ? ' is-small' : '' %>" title="Item shipment (no longer offered)"><i class="fa-solid fa-box" aria-hidden="true"></i> Item (no longer offered)</span><% } %>

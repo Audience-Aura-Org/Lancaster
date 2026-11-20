@@ -6,8 +6,9 @@ const svc = require('../services');
 const awb = require('../awb');
 const db = require('../db');
 const config = require('../config');
+const PET_PAGES = require('../pet-content');
 const { SERVICE_TYPES, BOOKING_STATUSES, BOOKING_FLOW, QUOTE_STATUSES, kindOf } = require('../domain');
-const { kindFrom, readShipment } = require('../shipment-form');
+const { readShipment } = require('../shipment-form');
 
 const router = express.Router();
 
@@ -21,18 +22,24 @@ const wantsText = (req) => req.xhr || /XMLHttpRequest/i.test(req.get('x-requeste
 
 /* --------------------------------------------- original site pages (theme) */
 
-const PAGES = ['index', 'about-us', 'service', 'ocean-freight', 'air-freight', 'cargo-freight', 'express-delivery',
-  'customs-clearance', 'project-cargo', 'pet-transport', 'reviews', 'locations', 'faqs', 'contact', 'privacy-policy', 'terms-of-service'];
+const PAGES = ['index', 'about-us', 'service', 'pet-transport', 'pet-ground-transport', 'pet-air-travel', 'international-pet-relocation',
+  'reviews', 'locations', 'faqs', 'contact', 'privacy-policy', 'terms-of-service'];
 
 router.get('/', (req, res) => res.render('site/index'));
 router.get('/:page.html', (req, res, next) => {
   if (!PAGES.includes(req.params.page)) return next();
+  // Pet service pages share one template, filled from src/pet-content.js
+  if (PET_PAGES[req.params.page]) return res.render('site/pet-service', { page: PET_PAGES[req.params.page], slug: req.params.page });
   res.render(`site/${req.params.page}`);
 });
 // Friendly URLs and the old tracking address
 const ALIASES = { '/about': '/about-us.html', '/services': '/service.html', '/contact': '/contact.html', '/faq': '/faqs.html',
   '/reviews': '/reviews.html', '/locations': '/locations.html', '/privacy': '/privacy-policy.html', '/terms': '/terms-of-service.html',
-  '/shipment-status.php': '/track' };
+  '/shipment-status.php': '/track',
+  // Pet-only business: the old item-shipping pages point to the matching pet service
+  '/air-freight.html': '/pet-air-travel.html', '/ocean-freight.html': '/international-pet-relocation.html',
+  '/cargo-freight.html': '/pet-ground-transport.html', '/express-delivery.html': '/pet-ground-transport.html',
+  '/customs-clearance.html': '/international-pet-relocation.html', '/project-cargo.html': '/pet-transport.html' };
 for (const [from, to] of Object.entries(ALIASES)) router.get(from, (req, res) => res.redirect(301, to));
 
 /* ---------------------------------------------------------------- contact */
@@ -75,18 +82,17 @@ function quoteView(res, kind, values, errors, status = 200) {
   return res.status(status).render('pages/quote', { title: 'Request a Quote', kind, values, errors });
 }
 
-// Step 1: "What are you sending?" (pet or item). Step 2: the form for that kind.
+// Pet-only quote form. Old links (?type=item, retired services) simply open the pet form.
 router.get('/quote', (req, res) => {
-  const kind = kindFrom({}, req.query);
   const service = v.oneOf(req.query.service, SERVICE_TYPES);
-  quoteView(res, kind, { service_type: service && kindOf(service) === kind ? service : '', pet_count: 1 }, {});
+  quoteView(res, 'pet', { service_type: service && kindOf(service) === 'pet' ? service : 'domestic_ground', pet_count: 1 }, {});
 });
 
 router.post('/quote', formLimiter, async (req, res, next) => {
   try {
     if (isBot(req)) return res.redirect('/quote/thanks');
     const b = req.body;
-    const kind = kindFrom(b);
+    const kind = 'pet';
     const { values, errors } = readShipment(b, kind);
     Object.assign(values, { name: v.str(b.name, 120), email: v.email(b.email), phone: v.str(b.phone, 40), message: v.str(b.message, 2000), consent: b.consent === 'on' });
     if (!values.name) errors.name = 'Please enter your name.';

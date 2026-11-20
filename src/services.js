@@ -105,7 +105,8 @@ function getEvents(bookingId) {
 async function sendBookingStatusEmail(bookingId) {
   const booking = getBooking(bookingId);
   const customer = getCustomer(booking.customer_id);
-  const mail = tpl.bookingStatus({ customer, booking, documents: getDocuments(bookingId) });
+  const reached = new Set(getEvents(bookingId).map((e) => e.status));
+  const mail = tpl.bookingStatus({ customer, booking, documents: getDocuments(bookingId), reached });
   return mailer.send({ to: customer.email, ...mail, template: `booking_${booking.status}`, bookingId });
 }
 

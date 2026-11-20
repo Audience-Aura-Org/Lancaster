@@ -58,24 +58,24 @@ const SAMPLES = [
   { customer: ['Mei Chen', 'mei.chen@example.com', '717-555-0104'], service_type: 'domestic_ground', pet_type: 'cat', pet_name: 'Mochi',
     origin: 'Harrisburg, PA', destination: 'Raleigh, NC', travel_date: day(-6), total_amount: 640,
     path: ['documents_complete', 'scheduled', 'completed'], docsReceived: 'all' },
-  { customer: ['Keystone Tools LLC', 'shipping@keystonetools.example.com', '717-555-0110'], service_type: 'ocean_freight', cargo_description: '1 x 20ft container of machine tools', dimensions: '20ft FCL', weight_lbs: 18500,
-    origin: 'Port of Philadelphia, PA', destination: 'Rotterdam, Netherlands', travel_date: day(21), total_amount: 4200,
+  { customer: ['Priya Patel', 'priya.patel@example.com', '717-555-0110'], service_type: 'international_air', pet_type: 'dog', pet_name: 'Bella', breed: 'Labrador Retriever', pet_age: '4 years', weight_lbs: 62,
+    origin: 'Philadelphia, PA', destination: 'Sydney, Australia', travel_date: day(95), total_amount: 6800,
     path: ['documents_pending'], docsReceived: 2 },
-  { customer: ['Susquehanna Medical Supply', 'logistics@susqmed.example.com', '717-555-0111'], service_type: 'air_freight', cargo_description: 'Medical equipment, 6 cartons', dimensions: '6 x 60x40x40 cm', weight_lbs: 210, pet_count: 6,
-    origin: 'Lancaster, PA', destination: 'Toronto, ON, Canada', travel_date: day(2), total_amount: 1980,
+  { customer: ['Marcus Green', 'marcus.green@example.com', '717-555-0111'], service_type: 'domestic_air', pet_type: 'cat', pet_name: 'Pepper', breed: 'Maine Coon', pet_age: '2 years', weight_lbs: 14,
+    origin: 'Lancaster, PA', destination: 'Seattle, WA', travel_date: day(2), total_amount: 1380,
     path: ['documents_complete', 'scheduled'], docsReceived: 'all',
-    details: { airline_awb: awb('014', '7654321'), flight_details: 'AC 731 PHL → YYZ, departs 14:05' } },
-  { customer: ['Amish Country Furniture', 'orders@acfurniture.example.com', '717-555-0112'], service_type: 'cargo_freight', cargo_description: '4 pallets of handmade furniture', dimensions: '4 pallets, 120x100x150 cm', weight_lbs: 2600, pet_count: 4,
-    origin: 'Bird-in-Hand, PA', destination: 'Columbus, OH', travel_date: day(5), total_amount: 1150,
+    details: { airline_awb: awb('016', '7654321'), flight_details: 'UA 1442 PHL → SEA, departs 09:40' } },
+  { customer: ['The Yoder Family', 'yoder.family@example.com', '717-555-0112'], service_type: 'domestic_ground', pet_type: 'dog', pet_name: 'Duke & Daisy', breed: 'Beagles', pet_count: 2, weight_lbs: 48,
+    origin: 'Bird-in-Hand, PA', destination: 'Columbus, OH', travel_date: day(5), total_amount: 980,
     path: [], docsReceived: 1 },
-  { customer: ['Rivera Law Office', 'office@riveralaw.example.com', '717-555-0113'], service_type: 'express_delivery', cargo_description: 'Signed contract documents (1 envelope)', weight_lbs: 1,
-    origin: 'Lancaster, PA', destination: 'New York, NY', travel_date: day(-1), total_amount: 145,
+  { customer: ['Elena Rossi', 'elena.rossi@example.com', '717-555-0113'], service_type: 'domestic_ground', pet_type: 'bird', pet_name: 'Kiwi', breed: 'African Grey parrot', pet_age: '11 years', weight_lbs: 1,
+    origin: 'Lancaster, PA', destination: 'New York, NY', travel_date: day(-1), total_amount: 420,
     path: ['documents_complete', 'scheduled', 'completed'], docsReceived: 'all' },
-  { customer: ['Dutch Valley Imports', 'imports@dutchvalley.example.com', '717-555-0114'], service_type: 'customs_clearance', cargo_description: 'Imported kitchenware, 2 pallets', weight_lbs: 900, pet_count: 2,
-    origin: 'Hamburg, Germany', destination: 'Lancaster, PA', travel_date: day(12), total_amount: 375,
-    path: ['documents_pending'], docsReceived: 2 },
-  { customer: ['Conestoga Energy', 'projects@conestoga.example.com', '717-555-0115'], service_type: 'project_cargo', cargo_description: 'Industrial transformer (oversized)', dimensions: '5.2 x 2.8 x 3.1 m', weight_lbs: 41000,
-    origin: 'Pittsburgh, PA', destination: 'Lancaster, PA', travel_date: day(30), total_amount: 16800,
+  { customer: ['David Chen', 'david.chen@example.com', '717-555-0114'], service_type: 'international_air', pet_type: 'cat', pet_name: 'Mochi & Tofu', breed: 'Ragdolls', pet_count: 2, weight_lbs: 20,
+    origin: 'Harrisburg, PA', destination: 'London, United Kingdom', travel_date: day(40), total_amount: 5200,
+    path: ['documents_pending'], docsReceived: 4 },
+  { customer: ['Grace Miller', 'grace.miller@example.com', '717-555-0115'], service_type: 'domestic_air', pet_type: 'small_mammal', pet_name: 'Clover', breed: 'Holland Lop rabbit', pet_age: '3 years', weight_lbs: 4,
+    origin: 'Pittsburgh, PA', destination: 'Denver, CO', travel_date: day(30), total_amount: 890,
     path: [], docsReceived: 0 },
   { customer: ['Tom Becker', 'tom.becker@example.com', '717-555-0106'], service_type: 'domestic_air', pet_type: 'dog', pet_name: 'Rocky', breed: 'French Bulldog', weight_lbs: 22,
     origin: 'Lancaster, PA', destination: 'Phoenix, AZ', travel_date: day(15), total_amount: 1600,
@@ -85,8 +85,8 @@ const SAMPLES = [
 const QUOTES = [
   { customer: ['Laura Kim', 'laura.kim@example.com', '717-555-0107'], service_type: 'international_air', pet_type: 'dog', pet_name: 'Coco', breed: 'Poodle mix', weight_lbs: 15,
     origin: 'Lancaster, PA', destination: 'London, United Kingdom', travel_date: day(70), message: 'Moving for work in spring. Coco has her microchip already.' },
-  { customer: ['Penn Bakery Co.', 'ops@pennbakery.example.com', '717-555-0116'], service_type: 'cargo_freight', pet_type: 'cargo', cargo_description: '2 pallets of bakery equipment', dimensions: '2 pallets', weight_lbs: 1400, pet_count: 2,
-    origin: 'Lancaster, PA', destination: 'Baltimore, MD', travel_date: day(10), message: 'Need a liftgate at delivery.' },
+  { customer: ['Hannah Weber', 'hannah.weber@example.com', '717-555-0116'], service_type: 'domestic_ground', pet_type: 'dog', pet_name: 'Bruno', breed: 'German Shepherd', pet_age: '6 years', weight_lbs: 80,
+    origin: 'Lancaster, PA', destination: 'Charlotte, NC', travel_date: day(10), message: 'Bruno gets anxious on long drives.' },
   { customer: ['Omar Haddad', 'omar.haddad@example.com', '717-555-0108'], service_type: 'domestic_ground', pet_type: 'cat', pet_name: 'Simba',
     origin: 'York, PA', destination: 'Atlanta, GA', travel_date: day(20), quoted: 720 },
 ];
@@ -108,7 +108,7 @@ async function add() {
     const [name, email, phone] = s.customer;
     const customer = svc.upsertCustomer({ name, email, phone });
     tag(email);
-    const booking = svc.createBooking({ ...s, customer_id: customer.id, pet_type: s.pet_type || 'cargo' }, null);
+    const booking = svc.createBooking({ ...s, customer_id: customer.id, pet_type: s.pet_type }, null);
     if (s.details) {
       d.prepare('UPDATE bookings SET airline_awb = ?, flight_details = ?, pickup_window = ? WHERE id = ?')
         .run(s.details.airline_awb || null, s.details.flight_details || null, s.details.pickup_window || null, booking.id);

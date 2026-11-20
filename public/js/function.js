@@ -28,10 +28,13 @@
 
 	
 	/* Slick Menu JS */
-	$('#menu').slicknav({
-		label : '',
-		prependTo : '.responsive-menu'
-	});
+	// Lancaster Pet Movers uses its own mobile menu (site-menu.js); the theme's SlickNav only runs if its old markup is present.
+	if ($.fn.slicknav && $('#menu').length) {
+		$('#menu').slicknav({
+			label : '',
+			prependTo : '.responsive-menu'
+		});
+	}
 
 	/* Youtube Background Video JS */
 	if ($('#herovideo').length) {
@@ -193,7 +196,26 @@
 
 
 	/* Animated Wow Js */	
-	new WOW().init();
+	// Lancaster Pet Movers: reveal ".wow" elements with IntersectionObserver instead of WOW.js.
+	// WOW.js measures positions without the site-wide CSS zoom, so content near the bottom of a
+	// page never appeared. Same effect: hidden until on screen, then the animate.css class plays.
+	if ('IntersectionObserver' in window) {
+		var wowEls = document.querySelectorAll('.wow');
+		var reveal = function (el) {
+			var delay = el.getAttribute('data-wow-delay');
+			if (delay) el.style.animationDelay = delay;
+			el.style.visibility = 'visible';
+			el.classList.add('animated');
+		};
+		var wowObserver = new IntersectionObserver(function (entries) {
+			entries.forEach(function (entry) {
+				if (entry.isIntersecting) { reveal(entry.target); wowObserver.unobserve(entry.target); }
+			});
+		}, { threshold: 0.05 });
+		wowEls.forEach(function (el) { el.style.visibility = 'hidden'; wowObserver.observe(el); });
+	} else if (typeof WOW === 'function') {
+		new WOW().init();
+	}
 	
 	/* Popup Video */
 	if ($('.popup-video').length) {

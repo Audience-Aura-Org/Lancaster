@@ -6,7 +6,7 @@ const db = require('../db');
 const v = require('../validate');
 const svc = require('../services');
 const dashboard = require('../dashboard');
-const { kindFrom, readShipment } = require('../shipment-form');
+const { readShipment } = require('../shipment-form');
 const awb = require('../awb');
 const { requireAdmin, requireOwner, audit } = require('../security');
 const { SERVICE_TYPES, PET_TYPES, QUOTE_STATUSES, BOOKING_STATUSES, DOCUMENTS, PACKAGE_TYPES, resolveDocuments, isFreight, isAir, CARGO, parseKind } = require('../domain');
@@ -193,14 +193,14 @@ router.get('/quotes', (req, res) => {
 });
 
 router.get('/quotes/new', (req, res) => {
-  const kind = kindFrom({}, req.query);
+  const kind = 'pet';
   res.render('admin/quote-new', { title: 'New quote request', kind, values: { pet_count: 1, service_type: defaultService(kind, req.query.service) }, errors: {} });
 });
 
 router.post('/quotes/new', async (req, res, next) => {
   try {
     const b = req.body;
-    const kind = kindFrom(b);
+    const kind = 'pet';
     const ship = readShipment(b, kind);
     const cust = readCustomer(b);
     const values = { ...ship.values, ...cust.c, message: v.str(b.message, 2000) };
@@ -320,14 +320,14 @@ function readCustomer(b) {
 }
 
 router.get('/bookings/new', (req, res) => {
-  const kind = kindFrom({}, req.query);
+  const kind = 'pet';
   res.render('admin/booking-new', { title: 'New booking', kind, values: { pet_count: 1, service_type: defaultService(kind, req.query.service) }, errors: {} });
 });
 
 router.post('/bookings/new', async (req, res, next) => {
   try {
     const b = req.body;
-    const kind = kindFrom(b);
+    const kind = 'pet';
     const ship = readShipment(b, kind);
     const cust = readCustomer(b);
     const values = { ...ship.values, ...cust.c, total_amount: v.num(b.total_amount, { min: 0, max: 100000000 }) };

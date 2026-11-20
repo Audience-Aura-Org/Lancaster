@@ -2,7 +2,7 @@
     'use strict';
 
     $(function () {
-        $('#menu').slicknav({ label: '', prependTo: '.responsive-menu' });
+        if ($.fn.slicknav && $('#menu').length) $('#menu').slicknav({ label: '', prependTo: '.responsive-menu' });
 
         function setHeaderHeight() {
             var height = $('header .header-sticky').outerHeight();

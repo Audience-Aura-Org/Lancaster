@@ -7,7 +7,7 @@
    const fe = (k) => errors[k] ? `<div class="error">${errors[k]}</div>` : ''; %>
 <input type="hidden" name="kind" value="<%= isPet ? 'pet' : 'item' %>">
 
-<h2 style="margin-top:24px"><i class="fa-solid <%= domain.SHIPMENT_KINDS[kind].icon %>"></i> <%= isPet ? 'Pet & trip' : 'Item & shipment' %></h2>
+<h2 style="margin-top:24px"><i class="fa-solid <%= domain.SHIPMENT_KINDS[kind].icon %>"></i> Pet &amp; trip</h2>
 <div class="form-grid cols-2">
   <div class="field <%= errors.service_type ? 'has-error' : '' %>">
     <label for="f-service_type">Service <span class="req">*</span></label>

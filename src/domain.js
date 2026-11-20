@@ -4,44 +4,45 @@
  * each service type needs. Emails and admin screens are driven from here.
  *
  * category: 'pet' (pet travel) or 'freight' (goods / cargo)
+ * retired:  true = no longer offered (pet-only business); kept so older records still display.
  * mode:     'air' (needs an airline AWB before "scheduled"), 'sea', 'ground' or 'none'
  */
 
 const SERVICE_TYPES = {
   domestic_ground: {
-    label: 'Domestic Ground Transport', short: 'Pet ground', icon: 'fa-van-shuttle', category: 'pet', mode: 'ground', slug: 'ground',
+    label: 'Domestic Ground Transport', short: 'Pet ground', icon: 'fa-van-shuttle', category: 'pet', mode: 'ground', slug: 'pet-ground-transport',
     blurb: 'Door-to-door pet transport by climate-controlled vehicle within the U.S.',
   },
   domestic_air: {
-    label: 'Domestic Air Transport', short: 'Pet domestic air', icon: 'fa-plane', category: 'pet', mode: 'air', slug: 'domestic-air',
+    label: 'Domestic Air Transport', short: 'Pet domestic air', icon: 'fa-plane', category: 'pet', mode: 'air', slug: 'pet-air-travel',
     blurb: 'Airline-booked pet travel between U.S. airports, with pickup and delivery.',
   },
   international_air: {
-    label: 'International Pet Relocation', short: 'Pet international', icon: 'fa-earth-americas', category: 'pet', mode: 'air', slug: 'international',
+    label: 'International Pet Relocation', short: 'Pet international', icon: 'fa-earth-americas', category: 'pet', mode: 'air', slug: 'international-pet-relocation',
     blurb: 'Export paperwork, airline booking and arrival coordination for moves abroad.',
   },
   ocean_freight: {
-    label: 'Ocean Freight', short: 'Ocean freight', icon: 'fa-ship', category: 'freight', mode: 'sea', slug: 'ocean-freight',
+    label: 'Ocean Freight', short: 'Ocean freight', icon: 'fa-ship', category: 'freight', mode: 'sea', slug: 'ocean-freight', retired: true,
     blurb: 'Full and shared containers, with coordinated port handling and onward delivery.',
   },
   air_freight: {
-    label: 'Air Freight', short: 'Air freight', icon: 'fa-plane-departure', category: 'freight', mode: 'air', slug: 'air-freight',
+    label: 'Air Freight', short: 'Air freight', icon: 'fa-plane-departure', category: 'freight', mode: 'air', slug: 'air-freight', retired: true,
     blurb: 'Air freight for urgent cargo, from pickup and flight planning to delivery.',
   },
   cargo_freight: {
-    label: 'Cargo Freight', short: 'Cargo freight', icon: 'fa-truck-moving', category: 'freight', mode: 'ground', slug: 'cargo-freight',
+    label: 'Cargo Freight', short: 'Cargo freight', icon: 'fa-truck-moving', category: 'freight', mode: 'ground', slug: 'cargo-freight', retired: true,
     blurb: 'Road and multimodal transport for pallets, commercial goods, equipment and general cargo.',
   },
   express_delivery: {
-    label: 'Express Delivery', short: 'Express', icon: 'fa-bolt', category: 'freight', mode: 'ground', slug: 'express-delivery',
+    label: 'Express Delivery', short: 'Express', icon: 'fa-bolt', category: 'freight', mode: 'ground', slug: 'express-delivery', retired: true,
     blurb: 'Priority delivery for urgent documents, parcels, parts and business shipments.',
   },
   customs_clearance: {
-    label: 'Customs Clearance', short: 'Customs', icon: 'fa-file-shield', category: 'freight', mode: 'none', slug: 'customs-clearance',
+    label: 'Customs Clearance', short: 'Customs', icon: 'fa-file-shield', category: 'freight', mode: 'none', slug: 'customs-clearance', retired: true,
     blurb: 'Document review and clearance coordination for cross-border shipments.',
   },
   project_cargo: {
-    label: 'Project Cargo', short: 'Project cargo', icon: 'fa-industry', category: 'freight', mode: 'ground', slug: 'project-cargo',
+    label: 'Project Cargo', short: 'Project cargo', icon: 'fa-industry', category: 'freight', mode: 'ground', slug: 'project-cargo', retired: true,
     blurb: 'Specialist planning for heavy, oversized, valuable or complex cargo.',
   },
 };

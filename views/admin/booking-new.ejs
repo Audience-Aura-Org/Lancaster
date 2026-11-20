@@ -1,19 +1,15 @@
 <%- include('_top') %>
 <div class="admin-head">
   <div>
-    <h1><%= kind ? (kind === 'pet' ? 'New pet booking' : 'New item shipment') : 'New booking' %></h1>
-    <div class="sub"><%= kind ? 'For bookings taken by phone or email.' : 'What is being moved?' %> Quote requests can also be converted from the quote page.</div>
+    <h1>New pet booking</h1>
+    <div class="sub">For bookings taken by phone or email. Quote requests can also be converted from the quote page.</div>
   </div>
-  <a class="btn btn-outline btn-sm" href="<%= kind ? '/admin/bookings/new' : '/admin/bookings' %>"><i class="fa-solid fa-arrow-left"></i> <%= kind ? 'Change type' : 'Bookings' %></a>
+  <a class="btn btn-outline btn-sm" href="/admin/bookings"><i class="fa-solid fa-arrow-left"></i> Bookings</a>
 </div>
 
-<% if (!kind) { %>
-  <%- include('_choose-kind', { chooseBase: '/admin/bookings/new', chooseWhat: 'booking' }) %>
-<% } else { %>
 <form class="panel" method="post" action="/admin/bookings/new" data-once>
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <% if (Object.keys(errors).length) { %><div class="alert alert-error"><i class="fa-solid fa-circle-exclamation"></i> Please fix the highlighted fields.</div><% } %>
-  <div class="kind-pill kind-<%= kind %>"><i class="fa-solid <%= domain.SHIPMENT_KINDS[kind].icon %>"></i> <%= domain.SHIPMENT_KINDS[kind].label %></div>
 
   <h2><i class="fa-solid fa-user"></i> Customer</h2>
   <div class="form-grid cols-2">
@@ -41,7 +37,6 @@
   </div>
   </div>
   <label class="check" style="margin-top:18px"><input type="checkbox" name="notify" checked> Email the customer a booking confirmation with their document checklist</label>
-  <div class="form-actions"><button class="btn btn-primary" type="submit">Create <%= kind === 'pet' ? 'pet booking' : 'item shipment' %></button></div>
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Create pet booking</button></div>
 </form>
-<% } %>
 <%- include('_bottom') %>

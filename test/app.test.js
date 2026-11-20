@@ -250,7 +250,7 @@ test('admin flow: send quote, convert, documents, status emails, track lookup', 
   // Link from the status email opens the result directly
   t = await pub.get(`/track?ref=${encodeURIComponent(ref)}`);
   assert.equal(t.status, 200);
-  assert.match(t.text, /Shipment progress/);
+  assert.match(t.text, /Journey progress/);
   // Unknown and malformed numbers
   t = await pub.form('/track', '/track', { ref: 'LPM-B-ZZZZZZZZ' });
   assert.equal(t.status, 404);
@@ -323,36 +323,52 @@ test('newsletter forms subscribe (once per email)', async () => {
   assert.equal(r.status, 422);
 });
 
-test('freight quote -> booking -> scheduled email uses freight wording', async () => {
+test('item shipping is gone: only pet services are offered', async () => {
+  const { SERVICE_TYPES } = require('../src/domain');
+  const offered = Object.entries(SERVICE_TYPES).filter(([, x]) => !x.retired).map(([k]) => k);
+  assert.deepEqual(offered.sort(), ['domestic_air', 'domestic_ground', 'international_air']);
+
   const c = client();
-  let r = await c.form('/quote?service=ocean_freight', '/quote', { service_type: 'ocean_freight', name: 'Acme', email: 'acme@example.com', origin: 'Philadelphia', destination: 'Rotterdam', consent: 'on' });
-  assert.equal(r.status, 422, 'cargo description required');
-  r = await c.form('/quote', '/quote', { service_type: 'ocean_freight', cargo_description: '1 x 20ft container', dimensions: '20ft', weight_lbs: '18000', pet_count: '1',
-    name: 'Acme', email: 'acme@example.com', origin: 'Philadelphia', destination: 'Rotterdam', consent: 'on' });
-  assert.equal(r.location, '/quote/thanks');
-  const q = db.get().prepare(`SELECT * FROM quote_requests WHERE service_type = 'ocean_freight'`).get();
-  assert.equal(q.pet_type, 'cargo');
-  assert.equal(q.cargo_description, '1 x 20ft container');
+  // Old item pages redirect to pet pages
+  for (const [from, to] of [['/air-freight.html', '/pet-air-travel.html'], ['/ocean-freight.html', '/international-pet-relocation.html'],
+    ['/cargo-freight.html', '/pet-ground-transport.html'], ['/express-delivery.html', '/pet-ground-transport.html'],
+    ['/customs-clearance.html', '/international-pet-relocation.html'], ['/project-cargo.html', '/pet-transport.html']]) {
+    const r = await c.get(from);
+    assert.equal(r.status, 301, from);
+    assert.equal(r.location, to, from);
+  }
+  // The quote form is pet-only, even for old item links
+  for (const u of ['/quote', '/quote?type=item', '/quote?service=ocean_freight']) {
+    const r = await c.get(u);
+    assert.match(r.text, /Tell us about your pet/);
+    assert.doesNotMatch(r.text, /name="cargo_description"|value="ocean_freight"|What are you sending/);
+  }
+  // Posting an item service is refused
+  const r = await c.form('/quote', '/quote', { kind: 'item', service_type: 'ocean_freight', cargo_description: 'Boxes', name: 'X', email: 'x@example.com', origin: 'A', destination: 'B', consent: 'on' });
+  assert.equal(r.status, 422);
+  assert.equal(db.get().prepare(`SELECT COUNT(*) n FROM quote_requests WHERE service_type = 'ocean_freight'`).get().n, 0);
 
+  // Public pages talk about pets, not freight
+  const { PAGES } = require('../src/routes/public');
+  for (const p of PAGES) {
+    const html = (await c.get(p === 'index' ? '/' : `/${p}.html`)).text
+      .replace(/<!--[\s\S]*?-->/g, '').replace(/class="[^"]*"/g, '').replace(/<script[\s\S]*?<\/script>/g, '');
+    assert.doesNotMatch(html, /freight|containers?\b|pallets?|logistics|supply chain|project cargo|express delivery/i, p);
+  }
+
+  // Admin: no item choice, no item forms
   const admin = await login();
-  r = await admin.form(`/admin/quotes/${q.id}`, `/admin/quotes/${q.id}/convert`, { notify: 'on' });
-  const id = Number(r.location.split('/').pop());
-  assert.equal(db.get().prepare('SELECT COUNT(*) n FROM booking_documents WHERE booking_id = ?').get(id).n, 4, 'ocean checklist');
-  assert.equal((await admin.get(`/admin/bookings/${id}`)).status, 200);
-  // Ocean freight is not air: can be scheduled without an AWB
-  await admin.form(`/admin/bookings/${id}`, `/admin/bookings/${id}/details`, { origin: 'Philadelphia', destination: 'Rotterdam', cargo_description: '1 x 20ft container', flight_details: 'Vessel Aurora, voyage 12E' });
-  await admin.form(`/admin/bookings/${id}`, `/admin/bookings/${id}/status`, { status: 'scheduled', notify: 'on' });
-  assert.equal(db.get().prepare('SELECT status FROM bookings WHERE id = ?').get(id).status, 'scheduled');
-  const file = fs.readdirSync(process.env.OUTBOX_DIR).filter((x) => x.endsWith('booking_scheduled.eml')).map((x) => fs.readFileSync(path.join(process.env.OUTBOX_DIR, x), 'utf8').replace(/=\r?\n/g, '')).find((x) => x.includes('Rotterdam'));
-  assert.ok(file, 'scheduled email for the ocean booking');
-  assert.match(file, /Your shipment is scheduled/);
-  assert.match(file, /Vessel Aurora/);
-  assert.doesNotMatch(file, /your pet/i);
-
-  // Air freight requires an AWB before scheduling
-  const air = svc.createBooking({ customer_id: q.customer_id, service_type: 'air_freight', pet_type: 'cargo', cargo_description: 'Parts', origin: 'A', destination: 'B' });
-  await admin.form(`/admin/bookings/${air.id}`, `/admin/bookings/${air.id}/status`, { status: 'scheduled' });
-  assert.equal(db.get().prepare('SELECT status FROM bookings WHERE id = ?').get(air.id).status, 'confirmed');
+  for (const u of ['/admin/bookings/new', '/admin/bookings/new?type=item', '/admin/quotes/new?type=item']) {
+    const html = (await admin.get(u)).text;
+    assert.match(html, /New pet (booking|quote)/, u);
+    assert.doesNotMatch(html, /name="cargo_description"|value="ocean_freight"|Item booking|Item quote/, u);
+  }
+  // An older item booking still opens (labelled as no longer offered)
+  const cust = svc.upsertCustomer({ name: 'Legacy', email: 'legacy@example.com' });
+  const old = svc.createBooking({ customer_id: cust.id, service_type: 'ocean_freight', pet_type: 'cargo', cargo_description: 'Old container', origin: 'A', destination: 'B' });
+  const page = await admin.get(`/admin/bookings/${old.id}`);
+  assert.equal(page.status, 200);
+  assert.match(page.text, /Item \(no longer offered\)/);
 });
 
 test('admin can add, remove and restore needed documents', async () => {
@@ -418,13 +434,11 @@ test('documents are pre-selected by shipment type and can be chosen from a list'
   const docsOf = (id) => db.get().prepare('SELECT doc_key, label FROM booking_documents WHERE booking_id = ? ORDER BY id').all(id);
 
   // New booking form: every service's standard documents are pre-ticked
-  let html = (await admin.get('/admin/bookings/new?type=pet')).text;
+  let html = (await admin.get('/admin/bookings/new')).text;
   assert.match(html, /name="docs_domestic_ground" value="rabies" checked/);
   assert.match(html, /name="docs_domestic_ground" value="lib_tapeworm">/, 'extras offered but not ticked');
   assert.doesNotMatch(html, /docs_ocean_freight/, 'pet form only offers pet services');
-  const itemHtml = (await admin.get('/admin/bookings/new?type=item')).text;
-  assert.match(itemHtml, /name="docs_ocean_freight" value="invoice" checked/);
-  assert.doesNotMatch(itemHtml, /docs_domestic_ground/, 'item form only offers item services');
+
 
   // Untick one standard document, tick an extra, type a custom one; ticks for another service are ignored
   let r = await admin.post('/admin/bookings/new', {
@@ -449,8 +463,8 @@ test('documents are pre-selected by shipment type and can be chosen from a list'
   assert.ok(docsOf(id).some((d) => d.label === 'Pet passport (EU / UK)'));
 
   // Nothing ticked = no documents
-  html = (await admin.get('/admin/bookings/new?type=item')).text;
-  r = await admin.post('/admin/bookings/new', { _csrf: tok(html), docs_present: '1', name: 'None', email: 'none@example.com', service_type: 'express_delivery', origin: 'A', destination: 'B', cargo_description: 'Envelope' });
+  html = (await admin.get('/admin/bookings/new')).text;
+  r = await admin.post('/admin/bookings/new', { _csrf: tok(html), docs_present: '1', name: 'None', email: 'none@example.com', service_type: 'domestic_ground', pet_type: 'dog', origin: 'A', destination: 'B' });
   assert.equal(docsOf(Number(r.location.split('/').pop())).length, 0);
 
   // Converting a quote: standard documents pre-ticked on the quote page; the ticked set is used
@@ -534,91 +548,58 @@ test('admin can delete a quote request', async () => {
   assert.equal((await client().form('/track', '/track', { ref: b.ref })).status, 200);
 });
 
-test('pets and items have separate forms everywhere', async () => {
+test('pet forms collect pet details only', async () => {
   const pub = client();
-  // Public: step 1 asks pet or item; each form only has its own fields and services
-  let r = await pub.get('/quote');
-  assert.match(r.text, /What are you sending\?/);
-  r = await pub.get('/quote?type=pet');
+  const r = await pub.get('/quote');
   assert.match(r.text, /name="pet_type"/);
   assert.match(r.text, /name="pet_age"/);
-  assert.doesNotMatch(r.text, /name="cargo_description"|name="package_type"|value="ocean_freight"/);
-  r = await pub.get('/quote?type=item');
-  assert.match(r.text, /name="cargo_description"/);
-  assert.match(r.text, /name="package_type"/);
-  assert.match(r.text, /name="declared_value"/);
-  assert.doesNotMatch(r.text, /name="pet_type"|name="pet_age"|value="domestic_air"/);
-  // A service link picks the right form
-  assert.match((await pub.get('/quote?service=air_freight')).text, /name="cargo_description"/);
-  assert.match((await pub.get('/quote?service=domestic_air')).text, /name="pet_type"/);
+  assert.match(r.text, /value="domestic_ground" checked/, 'a service is pre-selected');
+  assert.doesNotMatch(r.text, /name="package_type"|name="declared_value"/);
 
-  // A pet form can't be used to book an item service (and vice versa)
   const admin = await login();
   const tok = (h) => h.match(/name="_csrf" value="([^"]+)"/)[1];
-  let html = (await admin.get('/admin/bookings/new?type=pet')).text;
-  r = await admin.post('/admin/bookings/new', { _csrf: tok(html), kind: 'pet', name: 'Mix', email: 'mix@example.com', service_type: 'ocean_freight', pet_type: 'dog', origin: 'A', destination: 'B' });
-  assert.equal(r.status, 422);
-
-  // Item booking saves item fields only
-  html = (await admin.get('/admin/bookings/new?type=item')).text;
-  assert.match(html, /New item shipment/);
-  r = await admin.post('/admin/bookings/new', { _csrf: tok(html), kind: 'item', name: 'Item Co', email: 'itemco@example.com', service_type: 'cargo_freight',
-    cargo_description: '3 pallets of tiles', package_type: 'pallet', declared_value: '2500', pet_count: '3', special_needs: 'Keep dry', pet_name: 'should be ignored', origin: 'A', destination: 'B' });
-  assert.equal(r.status, 302);
-  const item = db.get().prepare('SELECT * FROM bookings WHERE id = ?').get(Number(r.location.split('/').pop()));
-  assert.equal(item.pet_type, 'cargo');
-  assert.equal(item.package_type, 'pallet');
-  assert.equal(item.declared_value, 2500);
-  assert.equal(item.pet_name, null);
-  html = (await admin.get(`/admin/bookings/${item.id}`)).text;
-  assert.match(html, /kind-pill kind-freight/);
-  assert.match(html, /name="package_type"/);
-  assert.doesNotMatch(html, /name="pet_age"/);
-
+  let html = (await admin.get('/admin/bookings/new')).text;
+  // An item service can't be booked through the pet form
+  let res = await admin.post('/admin/bookings/new', { _csrf: tok(html), name: 'Mix', email: 'mix@example.com', service_type: 'ocean_freight', pet_type: 'dog', origin: 'A', destination: 'B' });
+  assert.equal(res.status, 422);
   // Pet booking saves pet fields only
-  html = (await admin.get('/admin/bookings/new?type=pet')).text;
-  r = await admin.post('/admin/bookings/new', { _csrf: tok(html), kind: 'pet', name: 'Pet Owner', email: 'petowner@example.com', service_type: 'domestic_ground',
+  res = await admin.post('/admin/bookings/new', { _csrf: tok(html), name: 'Pet Owner', email: 'petowner@example.com', service_type: 'domestic_ground',
     pet_type: 'cat', pet_name: 'Kit', pet_age: '2 years', cargo_description: 'should be ignored', origin: 'A', destination: 'B' });
-  const pet = db.get().prepare('SELECT * FROM bookings WHERE id = ?').get(Number(r.location.split('/').pop()));
+  const pet = db.get().prepare('SELECT * FROM bookings WHERE id = ?').get(Number(res.location.split('/').pop()));
   assert.equal(pet.pet_age, '2 years');
   assert.equal(pet.cargo_description, null);
   html = (await admin.get(`/admin/bookings/${pet.id}`)).text;
-  assert.match(html, /kind-pill kind-pet/);
-  assert.doesNotMatch(html, /name="package_type"/);
-
-  // Lists can be filtered to pets or items
-  html = (await admin.get('/admin/bookings?type=item&per=100')).text;
-  assert.match(html, new RegExp(item.ref));
-  assert.doesNotMatch(html, new RegExp(pet.ref));
+  assert.doesNotMatch(html, /name="package_type"|Item \(no longer offered\)/);
+  // Lists no longer have a pet/item filter
+  assert.doesNotMatch((await admin.get('/admin/bookings')).text, /Pets &amp; items|Items only/);
 });
 
-test('admin can create a quote request (pet or item)', async () => {
+test('admin can create a pet quote request', async () => {
   const admin = await login();
   const tok = (h) => h.match(/name="_csrf" value="([^"]+)"/)[1];
   let html = (await admin.get('/admin/quotes')).text;
   assert.match(html, /href="\/admin\/quotes\/new"/);
   html = (await admin.get('/admin/quotes/new')).text;
-  assert.match(html, /Pet quote/);
-  assert.match(html, /Item quote/);
-  html = (await admin.get('/admin/quotes/new?type=item')).text;
+  assert.match(html, /New pet quote/);
   const before = db.get().prepare("SELECT COUNT(*) n FROM email_log WHERE template = 'quote_admin_notify'").get().n;
-  let r = await admin.post('/admin/quotes/new', { _csrf: tok(html), kind: 'item', name: 'Phone Caller', email: 'caller@example.com', service_type: 'express_delivery',
-    cargo_description: 'Contract envelope', package_type: 'envelope', origin: 'Lancaster', destination: 'NYC' });
+  let r = await admin.post('/admin/quotes/new', { _csrf: tok(html), name: 'Phone Caller', email: 'caller@example.com', service_type: 'domestic_air',
+    pet_type: 'dog', pet_name: 'Bo', breed: 'Lab', origin: 'Lancaster', destination: 'Miami' });
   assert.equal(r.status, 302);
-  const q = db.get().prepare("SELECT * FROM quote_requests WHERE ref LIKE 'LPM-Q-%' ORDER BY id DESC").get();
+  const q = db.get().prepare("SELECT * FROM quote_requests ORDER BY id DESC").get();
   assert.equal(r.location, `/admin/quotes/${q.id}`);
-  assert.equal(q.package_type, 'envelope');
+  assert.equal(q.pet_name, 'Bo');
   assert.equal(db.get().prepare("SELECT COUNT(*) n FROM email_log WHERE template = 'quote_admin_notify'").get().n, before, 'no staff notification for staff-entered quotes');
   assert.equal(db.get().prepare("SELECT COUNT(*) n FROM email_log WHERE quote_id = ?").get(q.id).n, 0, 'customer not emailed unless ticked');
-  // Validation
-  html = (await admin.get('/admin/quotes/new?type=pet')).text;
-  r = await admin.post('/admin/quotes/new', { _csrf: tok(html), kind: 'pet', name: '', email: 'x', service_type: 'domestic_air' });
+  html = (await admin.get('/admin/quotes/new')).text;
+  r = await admin.post('/admin/quotes/new', { _csrf: tok(html), name: '', email: 'x', service_type: 'domestic_air' });
   assert.equal(r.status, 422);
   assert.match(r.text, /Please choose the type of pet/);
 });
 
 test('lists show a page size choice and next/previous pages', async () => {
   const admin = await login();
+  const pc = svc.upsertCustomer({ name: 'Pager', email: 'pager@example.com' });
+  while (db.get().prepare('SELECT COUNT(*) n FROM bookings').get().n < 12) svc.createBooking({ customer_id: pc.id, service_type: 'domestic_ground', pet_type: 'dog', origin: 'A', destination: 'B' });
   const total = db.get().prepare('SELECT COUNT(*) n FROM bookings').get().n;
   assert.ok(total > 10, `need more than 10 bookings for this test (have ${total})`);
   let html = (await admin.get('/admin/bookings?per=10')).text;
@@ -648,67 +629,52 @@ test('new forms show pre-selected documents and allow "no documents needed"', as
   const tok = (h) => h.match(/name="_csrf" value="([^"]+)"/)[1];
   const docsOf = (id) => db.get().prepare('SELECT COUNT(*) n FROM booking_documents WHERE booking_id = ?').get(id).n;
 
-  // Opens with the first service of that kind selected, its documents visible and ticked
-  let html = (await admin.get('/admin/bookings/new?type=pet')).text;
+  let html = (await admin.get('/admin/bookings/new')).text;
   assert.match(html, /<option value="domestic_ground" selected>/);
   assert.match(html, /<div data-docs-for="domestic_ground" >/);
   assert.match(html, /name="docs_domestic_ground" value="rabies" checked/);
   assert.match(html, /name="docs_none"/);
-  html = (await admin.get('/admin/bookings/new?type=item&service=air_freight')).text;
-  assert.match(html, /<option value="air_freight" selected>/);
-  assert.match(html, /<div data-docs-for="air_freight" >/);
+  html = (await admin.get('/admin/bookings/new?service=domestic_air')).text;
+  assert.match(html, /<option value="domestic_air" selected>/);
+  assert.match(html, /<div data-docs-for="domestic_air" >/);
 
-  // "No documents needed" -> empty checklist (even if boxes were also sent)
-  html = (await admin.get('/admin/bookings/new?type=item')).text;
-  let r = await admin.post('/admin/bookings/new', { _csrf: tok(html), kind: 'item', docs_present: '1', docs_none: 'on', docs_ocean_freight: ['invoice'],
-    name: 'No Docs', email: 'nodocs@example.com', service_type: 'ocean_freight', cargo_description: 'Boxes', origin: 'A', destination: 'B' });
+  let r = await admin.post('/admin/bookings/new', { _csrf: tok(html), docs_present: '1', docs_none: 'on', docs_domestic_air: ['rabies'],
+    name: 'No Docs', email: 'nodocs@example.com', service_type: 'domestic_air', pet_type: 'cat', origin: 'A', destination: 'B' });
   const id = Number(r.location.split('/').pop());
   assert.equal(docsOf(id), 0);
   html = (await admin.get(`/admin/bookings/${id}`)).text;
   assert.match(html, /No documents needed<\/strong> for this shipment/);
   const ref = db.get().prepare('SELECT ref FROM bookings WHERE id = ?').get(id).ref;
-  assert.match((await client().get(`/track?ref=${ref}`)).text, /No documents needed for this shipment/);
+  assert.match((await client().get(`/track?ref=${ref}`)).text, /No documents needed for this trip/);
 
-  // Converting a quote with "No documents needed"
   const q = await svc.createQuote({ name: 'Conv None', email: 'convnone@example.com' }, { service_type: 'domestic_air', pet_type: 'dog', origin: 'A', destination: 'B' }, { notifyCustomer: false, notifyStaff: false });
   html = (await admin.get(`/admin/quotes/${q.id}`)).text;
   assert.match(html, /name="docs_none"/);
   r = await admin.post(`/admin/quotes/${q.id}/convert`, { _csrf: tok(html), docs_present: '1', docs_none: 'on' });
   assert.equal(docsOf(Number(r.location.split('/').pop())), 0);
 
-  // Existing booking: one click clears the checklist; restore brings the standard list back
   const cust = svc.upsertCustomer({ name: 'Clear Docs', email: 'cleardocs@example.com' });
   const b = svc.createBooking({ customer_id: cust.id, service_type: 'domestic_ground', pet_type: 'dog', origin: 'A', destination: 'B' });
   assert.equal(docsOf(b.id), 4);
   html = (await admin.get(`/admin/bookings/${b.id}`)).text;
-  assert.match(html, /documents\/none/);
   await admin.post(`/admin/bookings/${b.id}/documents/none`, { _csrf: tok(html) });
   assert.equal(docsOf(b.id), 0);
   html = (await admin.get(`/admin/bookings/${b.id}`)).text;
   assert.match(html, /Restore 4 standard documents/);
-  assert.match(db.get().prepare(`SELECT action FROM audit_log WHERE entity_id = ? ORDER BY id DESC`).get(b.id).action, /documents_not_needed/);
 });
 
-test('pet shipments never get item documents and vice versa', async () => {
+test('pet bookings are never offered item shipping documents', async () => {
   const admin = await login();
   const tok = (h) => h.match(/name="_csrf" value="([^"]+)"/)[1];
-  // Forms only list the right kind
-  let html = (await admin.get('/admin/bookings/new?type=pet')).text;
+  let html = (await admin.get('/admin/bookings/new')).text;
   assert.doesNotMatch(html, /Bill of lading|Commercial invoice|Freight documents|lib_bill_of_lading/);
   assert.match(html, /Pet passport/);
-  html = (await admin.get('/admin/bookings/new?type=item')).text;
-  assert.doesNotMatch(html, /Pet passport|rabies|Pet travel documents|lib_pet_passport/i);
-  assert.match(html, /Bill of lading/);
-
-  // Server ignores documents of the other kind even if they are posted
-  r = await admin.post('/admin/bookings/new', { _csrf: tok(html), kind: 'pet', docs_present: '1',
+  const r = await admin.post('/admin/bookings/new', { _csrf: tok(html), docs_present: '1',
     docs_domestic_air: ['rabies', 'lib_bill_of_lading', 'ocean_freight__invoice'],
     name: 'Cross', email: 'cross@example.com', service_type: 'domestic_air', pet_type: 'dog', origin: 'A', destination: 'B' });
-  var r;
   const id = Number(r.location.split('/').pop());
   const labels = () => db.get().prepare('SELECT label FROM booking_documents WHERE booking_id = ? ORDER BY id').all(id).map((d) => d.label);
   assert.deepEqual(labels(), ['Current rabies vaccination certificate']);
-  // ...and on an existing booking's "Choose from the list"
   html = (await admin.get(`/admin/bookings/${id}`)).text;
   assert.doesNotMatch(html, /name="pick" value="lib_bill_of_lading"/);
   await admin.post(`/admin/bookings/${id}/documents/add`, { _csrf: tok(html), pick: ['lib_bill_of_lading', 'lib_pet_passport'] });

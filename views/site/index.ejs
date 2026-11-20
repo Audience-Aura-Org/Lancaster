@@ -6,11 +6,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="description" content="Freight, delivery, and logistics support from <%= business.name %>. Explore ocean, air, cargo, customs, and pet transport services.">
+    <meta name="description" content="Safe, caring pet transport from <%= business.name %>: door-to-door ground transport, domestic pet flights and international pet relocation.">
     <meta name="keywords" content="">
     <meta name="author" content="<%= business.name %>">
     <!-- Page Title -->
-    <title>Freight and Delivery Services | <%= business.name %></title>
+    <title>Pet Transport &amp; Relocation | <%= business.name %></title>
     <!-- Favicon Icon -->
     <link rel="shortcut icon" type="image/x-icon" href="/images/img/favicon.png">
     <!-- Google Fonts Css-->
@@ -56,85 +56,7 @@
     </div>
     <!-- Magic Cursor End -->
 
-    <!-- Topbar Section Start -->
-    <div class="topbar">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-9 col-md-8">
-                    <!-- Topbar Contact Information Start -->
-                    <div class="topbar-contact-info">
-                        <ul>
-                            <li><a href="locations.html"><i class="fa-solid fa-location-dot"></i>Global Locations</a></li>
-                            <li><a class="topbar-contact-link" href="mailto:<%= business.email %>"><i class="fa-solid fa-envelope"></i><span><strong>Email Our Team</strong> <%= business.email %></span></a></li>
-                        </ul>
-                    </div>
-                    <!-- Topbar Contact Information End -->
-                </div>
-
-                <div class="col-lg-3 col-md-4">
-                    <!-- Topbar Social Links Start -->
-                    <div class="topbar-social-links">
-                        <ul>
-                            <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-                            <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
-                        </ul>
-                    </div>
-                    <!-- Topbar Social Links End -->
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Topbar Section End -->
-
-    <!-- Header Start -->
-    <header class="main-header">
-        <div class="header-sticky">
-            <nav class="navbar navbar-expand-lg">
-                <div class="container">
-                   <!-- Logo Start -->
-<a class="navbar-brand" href="/" aria-label="<%= business.name %> home"><span class="brand-mark"><span class="brand-initials" aria-hidden="true"><i class="fa-solid fa-paw"></i></span><span class="brand-name">Lancaster <small>Pet Movers</small></span></span></a>
-<!-- Logo End -->
-    
-                    <!-- Main Menu Start -->
-                    <div class="collapse navbar-collapse main-menu">
-                        <ul class="navbar-nav mr-auto" id="menu">
-                            <li class="nav-item has-submen"><a class="nav-link" href="index.html">Home</a>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="about-us.html">About Us</a></li>
-                            <li class="nav-item has-submenu"><a class="nav-link" href="service.html">Services</a>
-                                <ul class="sub-menu">
-                                    <li class="nav-item"><a class="nav-link" href="ocean-freight.html">Ocean Freight</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="air-freight.html">Air Freight</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="cargo-freight.html">Cargo Freight</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="express-delivery.html">Express Delivery</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="customs-clearance.html">Customs Clearance</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="project-cargo.html">Project Cargo</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="pet-transport.html">Pet Transport</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="reviews.html">Reviews</a></li>
-                            <li class="nav-item"><a class="nav-link" href="locations.html">Locations</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/track">Track</a></li>                            
-                            <li class="nav-item has-submenu"><a class="nav-link" href="#">Pet Delivery</a>
-                                <ul class="sub-menu">
-                                    <li class="nav-item"><a class="nav-link" href="pet-transport.html">Pet Transport</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="faqs.html">FAQs</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
-                        </ul>
-                    </div>
-                    <!-- Main Menu End -->
-
-                    <div class="navbar-toggle"></div>                         
-                </div>
-            </nav>
-
-            <div class="responsive-menu"></div>
-        </div>
-    </header>
-    <!-- Header End -->
+    <%- include('../partials/site-header') %>
 
     <!-- Hero Section Start -->
     <div class="hero hero-video" style="background-image: url('/images/hero-port-sunset.jpg'); background-size: cover; background-position: center;">
@@ -144,13 +66,13 @@
                     <!-- Hero Left Content Start -->
                     <div class="hero-content">
                         <div class="hero-content-title">
-                            <h1 class="text-anime-style-3">Shipping made simpler <span>across the globe</span></h1>
+                            <h1 class="text-anime-style-3">Every pet travels <span>like family</span></h1>
                         </div>
                         <div class="hero-content-body wow fadeInUp" data-wow-delay="0.25s">
-                            <p> Freight, storage, distribution, and supply chain support, coordinated around your cargo and delivery needs.</p>
+                            <p>Safe, caring pet transport by road and air, across the country and around the world, planned around your pet's comfort.</p>
                         </div>
                         <div class="hero-content-footer wow fadeInUp" data-wow-delay="0.5s">
-                            <a href="/track" class="btn-default">Track Shipment</a>
+                            <a href="/quote" class="btn-default">Get a Free Quote</a> <a href="/track" class="btn-default btn-highlighted">Track Your Pet</a>
                         </div>
                     </div>
                     <!-- Hero Left Content End -->
@@ -170,16 +92,16 @@
                     <!-- Cargo Shipment Item Start -->
                     <div class="cargo-shipment-item wow fadeInUp"  data-wow-delay="0.25s">
                         <div class="cargo-shipment-image">
-                            <img src="/images/cargo-shipment-bg-img-1.jpg" alt="">
+                            <img src="/images/truck-road.jpg" alt="">
                         </div>
                         <div class="cargo-shipment-content">
                             <div class="cargo-shipment-icon">
                                  
                             </div>
-                            <h3>Ocean Freight</h3>
-                            <p>Move international cargo by sea with practical, cost-conscious shipping options.</p>
+                            <h3>Pet Ground Transport</h3>
+                            <p>Door-to-door road travel in climate-controlled vehicles, with regular comfort stops.</p>
                             <div class="cargo-shipment-readmore">
-                            <a href="ocean-freight.html">Read More</a>
+                            <a href="/pet-ground-transport.html">Read More</a>
                             </div>
                         </div>
                     </div>
@@ -190,16 +112,16 @@
                     <!-- Cargo Shipment Item Start -->
                     <div class="cargo-shipment-item active wow fadeInUp"  data-wow-delay="0.5s">
                         <div class="cargo-shipment-image">
-                            <img src="/images/cargo-shipment-bg-img-2.jpg" alt="">
+                            <img src="/images/plane-clouds.jpg" alt="">
                         </div>
                         <div class="cargo-shipment-content">
                             <div class="cargo-shipment-icon">
                                 
                             </div>
-                            <h3>Air Freight</h3>
-                            <p>Connect urgent shipments with suitable air freight routes around the world.</p>
+                            <h3>Domestic Pet Flights</h3>
+                            <p>Airline-booked travel with crate sizing, health certificate timing and airport pickup.</p>
                             <div class="cargo-shipment-readmore">
-                                <a href="air-freight.html">Read More</a>
+                                <a href="/pet-air-travel.html">Read More</a>
                             </div>
                         </div>
                     </div>
@@ -210,16 +132,16 @@
                     <!-- Cargo Shipment Item Start -->
                     <div class="cargo-shipment-item wow fadeInUp"  data-wow-delay="0.75s">
                         <div class="cargo-shipment-image">
-                            <img src="/images/cargo-shipment-bg-img-3.jpg" alt="">
+                            <img src="/images/post-22.jpeg" alt="">
                         </div>
                         <div class="cargo-shipment-content">
                             <div class="cargo-shipment-icon">
                                
                             </div>
-                            <h3>Cargo Freight</h3>
-                            <p>Plan commercial freight around your cargo, destination, and schedule.</p>
+                            <h3>International Relocation</h3>
+                            <p>Document timelines, government endorsements and arrival support for moves abroad.</p>
                             <div class="cargo-shipment-readmore">
-                                <a href="cargo-freight.html">Read More</a>
+                                <a href="/international-pet-relocation.html">Read More</a>
                             </div>
                         </div>
                     </div>
@@ -239,21 +161,21 @@
                     <div class="home-transportation-content">
                         <!-- Section Title Start -->
                         <div class="section-title">
-                            <h2 class="text-anime-style-3"><span>Transport options</span> for every journey</h2>
+                            <h2 class="text-anime-style-3"><span>Pet travel</span> planned with care</h2>
                         </div>
                         <!-- Section Title End -->
 
                         <!-- Home Transportation Body Start -->
                         <div class="home-transportation-body">
-                            <p class="wow fadeInUp" data-wow-delay="0.25s"><strong> <%= business.name %></strong> helps businesses and individuals move goods locally and internationally. From ocean and air freight to cargo distribution, we plan transport around your shipment, route, and delivery needs.</p>
-                            <p class="wow fadeInUp" data-wow-delay="0.5s">We bring logistics experience and practical technology together to plan shipments, coordinate each stage, and keep your supply chain moving.</p>
+                            <p class="wow fadeInUp" data-wow-delay="0.25s"><strong><%= business.name %></strong> helps families move their dogs, cats, birds and other companions safely, whether that's a drive to the next state or a flight to another continent.</p>
+                            <p class="wow fadeInUp" data-wow-delay="0.5s">One coordinator plans every stage with you: the route, the paperwork, the travel crate and the hand-over, with updates you can follow online.</p>
                         </div>
                         <!-- Home Transportation Body End -->
 
                         <!-- Home Transportation footer Start -->
                         <div class="home-transportation-footer wow fadeInUp"  data-wow-delay="0.75s">
                             <div class="transportation-footer-btn">
-                                <a href="/track" class="btn-default"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i><span>Track Shipment</span></a>
+                                <a href="/track" class="btn-default"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i><span>Track Your Pet</span></a>
                             </div>                            
                         </div>
                         <!-- Home Transportation footer End -->
@@ -278,8 +200,8 @@
 
                         <!-- Facts Counter Box Start -->
                         <div class="transportation-counter-box wow fadeInUp"  data-wow-delay="0.5s">
-                            <h3><span class="counter">25</span>+</h3>
-                            <p>Years in Business</p>
+                            <h3><i class="fa-solid fa-paw" aria-hidden="true"></i></h3>
+                            <p>Every pet travels like family</p>
                         </div>
                         <!-- Facts Counter Box End -->
                     </div>
@@ -296,8 +218,8 @@
             <div class="row">
                 <!-- Section Title Start -->
                 <div class="section-title">
-                    <h2 class="text-anime-style-3">Find the right<span> shipping service</span></h2>
-                    <p class="wow fadeInUp" data-wow-delay="0.25s">Explore ocean, air, and cargo freight services built around your next shipment.</p>
+                    <h2 class="text-anime-style-3">Find the right<span> way to travel</span></h2>
+                    <p class="wow fadeInUp" data-wow-delay="0.25s">By road, by air or abroad: we help you choose the safest option for your pet.</p>
                 </div>
                 <!-- Section Title End -->
             </div>
@@ -309,7 +231,7 @@
                         <!-- Our Service Image Start -->
                         <div class="our-service-image">
                             <figure class="image-anime">
-                                <img src="/images/service-1.jpg" alt="">
+                                <img src="/images/truck-road.jpg" alt="">
                             </figure>
                         </div>
                         <!-- Our Service Image End -->
@@ -317,14 +239,14 @@
                         <!-- Our Service Content Start -->
                         <div class="our-service-content">
                             <div class="service-content-box">
-                                <div class="our-service-icon"><i class="fa-solid fa-ship" aria-hidden="true"></i></div>
+                                <div class="our-service-icon"><i class="fa-solid fa-van-shuttle" aria-hidden="true"></i></div>
                                 <div class="our-service-title">
-                                    <h2><a href="ocean-freight.html">Ocean Freight</a></h2>
-                                    <p class="service-summary">Full and shared containers, with coordinated port handling and onward delivery.</p>
+                                    <h2><a href="/pet-ground-transport.html">Pet Ground Transport</a></h2>
+                                    <p class="service-summary">Door to door by climate-controlled vehicle, with comfort stops and driver updates.</p>
                                 </div>
                             </div>
                             <div class="our-service-content-button">
-                                <a href="ocean-freight.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
+                                <a href="/pet-ground-transport.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
                             </div>                         
                         </div>
                         <!-- Our Service Content End -->
@@ -338,7 +260,7 @@
                         <!-- Our Service Image Start -->
                         <div class="our-service-image">
                             <figure class="image-anime">
-                                <img src="/images/service-2.jpg" alt="">
+                                <img src="/images/plane-clouds.jpg" alt="">
                             </figure>
                         </div>
                         <!-- Our Service Image End -->
@@ -346,14 +268,14 @@
                         <!-- Our Service Content Start -->
                         <div class="our-service-content">
                             <div class="service-content-box">
-                                <div class="our-service-icon"><i class="fa-solid fa-plane-departure" aria-hidden="true"></i></div>
+                                <div class="our-service-icon"><i class="fa-solid fa-plane" aria-hidden="true"></i></div>
                                 <div class="our-service-title">
-                                    <h2><a href="air-freight.html">Air Freight</a></h2>
-                                    <p class="service-summary">Air freight for urgent cargo, from pickup and flight planning to delivery.</p>
+                                    <h2><a href="/pet-air-travel.html">Domestic Pet Flights</a></h2>
+                                    <p class="service-summary">Airline-booked travel between U.S. airports, with pickup and delivery.</p>
                                 </div>
                             </div>
                             <div class="our-service-content-button">
-                                <a href="air-freight.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
+                                <a href="/pet-air-travel.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
                             </div>                         
                         </div>
                         <!-- Our Service Content End -->
@@ -367,7 +289,7 @@
                         <!-- Our Service Image Start -->
                         <div class="our-service-image">
                             <figure class="image-anime">
-                                <img src="/images/service-3.jpg" alt="">
+                                <img src="/images/post-22.jpeg" alt="">
                             </figure>
                         </div>
                         <!-- Our Service Image End -->
@@ -375,14 +297,14 @@
                         <!-- Our Service Content Start -->
                         <div class="our-service-content">
                             <div class="service-content-box">
-                                <div class="our-service-icon"><i class="fa-solid fa-truck-moving" aria-hidden="true"></i></div>
+                                <div class="our-service-icon"><i class="fa-solid fa-earth-americas" aria-hidden="true"></i></div>
                                 <div class="our-service-title">
-                                    <h2><a href="cargo-freight.html">Cargo Freight</a></h2>
-                                    <p class="service-summary">Road and multimodal transport for pallets, commercial goods, equipment, and general cargo.</p>
+                                    <h2><a href="/international-pet-relocation.html">International Relocation</a></h2>
+                                    <p class="service-summary">Export paperwork, airline booking and arrival coordination for moves abroad.</p>
                                 </div>
                             </div>
                             <div class="our-service-content-button">
-                                <a href="cargo-freight.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
+                                <a href="/international-pet-relocation.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
                             </div>                         
                         </div>
                         <!-- Our Service Content End -->
@@ -408,11 +330,11 @@
                     <!-- Our Cta Box Start -->
                     <div class="our-cta-box">
                         <div class="our-contract-title">
-                            <h2 class="text-anime-style-3">Let’s plan your next shipment</h2>
+                            <h2 class="text-anime-style-3">Let’s plan your pet’s move</h2>
                         </div>
                         <div class="our-contract-body">
-                            <p class="wow fadeInUp" data-wow-delay="0.25s">Need help choosing a service, requesting a price, or checking a shipment? Contact our team for guidance on your next step.</p>
-                            <a href="mailto:<%= business.email %>" class="btn-default wow fadeInUp" data-wow-delay="0.5s">Talk to Our Team</a>
+                            <p class="wow fadeInUp" data-wow-delay="0.25s">Not sure which option is right for your pet? Tell us about them and your route, and we'll recommend the safest way to travel.</p>
+                            <a href="/quote" class="btn-default wow fadeInUp" data-wow-delay="0.5s">Get a Free Quote</a>
                         </div>
                     </div>
                     <!-- Our Cta Box End -->
@@ -422,123 +344,7 @@
     </div>
     <!-- Our Contract Section End -->
 
-    <!-- recent project section Start -->
-    <div class="recent-project">
-        <div class="container">
-            <div class="row">
-                <!-- Section Title Start -->
-                <div class="section-title">
-                    <h2 class="text-anime-style-3">Explore <span> our cargo projects</span></h2>
-                    <p class="wow fadeInUp" data-wow-delay="0.25s">Explore cargo movements that bring together route planning, specialist handling, and coordinated delivery.</p>
-                </div>
-                <!-- Section Title End -->
-            </div>
-
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="project-slider">
-                        <div class="swiper">
-                            <div class="swiper-wrapper">
-                                <!-- recent projects slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="project-item">
-                                        <div class="project-image">
-                                            <figure class="image-anime">
-                                                <img src="/images/project-img-1.jpg" alt="">
-                                            </figure>
-                                        </div>
-                                        <div class="project-content">
-                                            <div class="project-content-title">
-                                                <h3><a href="#">Freight Ship</a></h3>
-                                                <span><a href="#"><i class="fa-solid fa-arrow-right-long"></i></a></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- recent projects slide End -->
-
-                                <!-- recent projects slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="project-item">
-                                        <div class="project-image">
-                                            <figure class="image-anime">
-                                                <img src="/images/project-img-2.jpg" alt="">
-                                            </figure>
-                                        </div>
-                                        <div class="project-content">
-                                            <div class="project-content-title">
-                                                <h3><a href="#">Maritime Carrier</a></h3>
-                                                <span><a href="#"><i class="fa-solid fa-arrow-right-long"></i></a></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- recent projects slide End -->
-
-                                <!-- recent projects slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="project-item">
-                                        <div class="project-image">
-                                            <figure class="image-anime">
-                                                <img src="/images/project-img-3.jpg" alt="">
-                                            </figure>
-                                        </div>
-                                        <div class="project-content">
-                                            <div class="project-content-title">
-                                                <h3><a href="#">Workboat</a></h3>
-                                                <span><a href="#"><i class="fa-solid fa-arrow-right-long"></i></a></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- recent projects slide End -->
-
-                                <!-- recent projects slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="project-item">
-                                        <div class="project-image">
-                                            <figure class="image-anime">
-                                                <img src="/images/project-img-4.jpg" alt="">
-                                            </figure>
-                                        </div>
-                                        <div class="project-content">
-                                            <div class="project-content-title">
-                                                <h3><a href="#">Car Ferry</a></h3>
-                                                <span><a href="#"><i class="fa-solid fa-arrow-right-long"></i></a></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- recent projects slide End -->
-
-                                <!-- recent projects slide Start -->
-                                <div class="swiper-slide">
-                                    <div class="project-item">
-                                        <div class="project-image">
-                                            <figure class="image-anime">
-                                                <img src="/images/project-img-5.jpg" alt="">
-                                            </figure>
-                                        </div>
-                                        <div class="project-content">
-                                            <div class="project-content-title">
-                                                <h3><a href="#">Cargo Hauler</a></h3>
-                                                <span><a href="#"><i class="fa-solid fa-arrow-right-long"></i></a></span>
-                                            </div>
-                                        </div>
-                                    </div> 
-                                </div>
-                                <!-- recent projects slide End -->
-                            </div>
-                            <div class="swiper-pagination"></div>
-                        </div>
-                        <div class="client-button-prev"><i class="fa-regular fa-circle-left"></i></div>
-                        <div class="client-button-next"><i class="fa-regular fa-circle-right"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- recent project section End -->
+    
 
     <!-- Our Goals Section Start -->
     <div class="our-goals">
@@ -546,21 +352,21 @@
             <div class="row align-items-center">
                 <!-- Section Title Start -->
                 <div class="section-title">
-                    <h2 class="text-anime-style-3">Our work <span> in numbers</span></h2>
-                    <p class="wow fadeInUp" data-wow-delay="0.25s">We’re building a more connected service network to make shipping simpler. By improving how we plan and coordinate deliveries, we help customers keep their businesses moving.</p>
+                    <h2 class="text-anime-style-3">Why families <span>choose us</span></h2>
+                    <p class="wow fadeInUp" data-wow-delay="0.25s">Moving is stressful enough. We plan each trip around your pet's needs and keep you informed from the first call to the reunion.</p>
                 <!-- Section Title End -->
             </div>
             </div>
 
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-3 col-md-6">
                     <!-- Our Goals Item Start -->
                     <div class="our-goals-item wow fadeInUp" data-wow-delay="0.25s">
                       
                         <!-- Facts Counter Box Start -->
                         <div class="our-goals-counter">
-                            <h3><span class="counter">89985</span>+</h3>
-                            <p>Completed Deliveries</p>
+                            <h3>Road &amp; Air</h3>
+                            <p>Ground transport and pet flights</p>
                         </div>
                         <!-- Facts Counter Box End -->
                     </div>
@@ -573,8 +379,8 @@
                       
                         <!-- Facts Counter Box Start -->
                         <div class="our-goals-counter">
-                            <h3><span class="counter">89870</span>+</h3>
-                            <p>Customers Served</p>
+                            <h3>Door to Door</h3>
+                            <p>Pickup and hand-over arranged for you</p>
                         </div>
                         <!-- Facts Counter Box End -->
                     </div>
@@ -587,17 +393,11 @@
                        
                         <!-- Facts Counter Box Start -->
                         <div class="our-goals-counter">
-                            <h3><span class="counter">79</span>+</h3>
-                            <p>Global Locations</p>                                
+                            <h3>U.S. &amp; Abroad</h3>
+                            <p>Domestic moves and international relocation</p>                                
                         </div>
                         <!-- Facts Counter Box End -->
                     </div>
-                    <!-- Our Goals Item End -->
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <!-- Our Goals Item Start -->
-                   
                     <!-- Our Goals Item End -->
                 </div>
             </div>
@@ -622,34 +422,34 @@
                     <div class="providing-content">
                         <!-- Section Title Start -->
                         <div class="section-title">
-                            <h2 class="text-anime-style-3">Practical support for <span> every shipment</span></h2>
+                            <h2 class="text-anime-style-3">Caring support for <span>every journey</span></h2>
                         </div>
                         <!-- Section Title End -->
 
                         <!-- Providing Content Body Start -->
                         <div class="providing-content-body">
-                            <p class="wow fadeInUp" data-wow-delay="0.25s">From tracking updates to transport handoffs, we focus on the details that keep your shipments moving. Our team coordinates each stage and helps you understand what comes next.</p>
+                            <p class="wow fadeInUp" data-wow-delay="0.25s">From the travel crate to the final hand-over, we focus on the details that keep your pet calm and comfortable, and keep you informed about what comes next.</p>
 
                             <div class="providing-item-box">
                                 <div class="providing-item wow fadeInUp" data-wow-delay="0.25s">
                                     <div class="icon-box">
                                         <img src="/images/icon-porviding-1.svg" alt="">
                                     </div>
-                                    <span>Cost-conscious planning</span>
+                                    <span>One personal coordinator</span>
                                 </div>
 
                                 <div class="providing-item wow fadeInUp" data-wow-delay="0.5s">
                                     <div class="icon-box">
                                         <img src="/images/icon-porviding-2.svg" alt="">
                                     </div>
-                                    <span>Efficient delivery routes</span>
+                                    <span>Comfort-first routes</span>
                                 </div>
 
                                 <div class="providing-item wow fadeInUp" data-wow-delay="0.75s">
                                     <div class="icon-box">
                                         <img src="/images/icon-porviding-3.svg" alt="">
                                     </div>
-                                    <span>Shipment tracking updates</span>
+                                    <span>Updates at every stage</span>
                                 </div>
                             </div>
                         </div>  
@@ -662,261 +462,10 @@
     </div>
     <!-- Providing Service Section End -->
 
-    <!-- latest posts section Start -->
-    <div class="latest-posts">
-        <div class="container">
-            <div class="row">
-                <!-- Section Title Start -->
-                <div class="section-title">
-                    <h2 class="text-anime-style-3">Latest <span> news and insights</span></h2>
-                    <p class="wow fadeInUp" data-wow-delay="0.25s">Read the latest from <%= business.name %>, including service developments, shipping insights, and company updates.</p>
-                </div>
-                <!-- Section Title End -->
-            </div>
             
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <!-- Post Item Start -->
-                    <div class="post-item wow fadeInUp" data-wow-delay="0.25s">
-                        <!-- Post Featured Image Start -->
-                        <div class="post-featured-image">
-                            <figure class="image-anime">
-                                <img src="/images/post-1.jpg" alt="">
-                            </figure>
-                        </div>
-                        <!-- Post Featured Image End -->
-
-                        <!-- Post Body Start -->
-                        <div class="post-body">
-                            <h3><a href="#">Managing the Challenges of International Freight</a></h3>
-                            <div class="post-meta">
-                                <ul>
-                                    <li><a href="#">CEO /</a></li>
-                                    <li><a href="#">  2025</a></li>
-                                </ul>
-                            </div>
-                            <div class="post-readmore">
-                                <a href="#">Read More</a>
-                            </div>
-                        </div>
-                        <!-- Post Body End -->
-                    </div>
-                    <!-- Post Item End -->
-                </div>
-
-                <div class="col-lg-4 col-md-6">
-                    <!-- Post Item Start -->
-                    <div class="post-item wow fadeInUp" data-wow-delay="0.5s">
-                        <!-- Post Featured Image Start -->
-                        <div class="post-featured-image">
-                            <figure class="image-anime">
-                                <img src="/images/post-2.jpg" alt="">
-                            </figure>
-                        </div>
-                        <!-- Post Featured Image End -->
-
-                        <!-- Post Body Start -->
-                        <div class="post-body">
-                            <h3><a href="#">Planning More Responsible Cargo Transport</a></h3>
-
-                            <div class="post-meta">
-                                <ul>
-                                    <li><a href="#">Manager /</a></li>
-                                    <li><a href="#"> 2025</a></li>
-                                </ul>
-                            </div>
-                            <div class="post-readmore">
-                                <a href="#">Read More</a>
-                            </div>
-                        </div>
-                        <!-- Post Body End -->
-                    </div>
-                    <!-- Post Item End -->
-                </div>
-
-                <div class="col-lg-4 col-md-6">
-                    <!-- Post Item Start -->
-                    <div class="post-item wow fadeInUp" data-wow-delay="0.75s">
-                        <!-- Post Featured Image Start -->
-                        <div class="post-featured-image">
-                            <figure class="image-anime">
-                                <img src="/images/post-3.jpg" alt="">
-                            </figure>
-                        </div>
-                        <!-- Post Featured Image End -->
-
-                        <!-- Post Body Start -->
-                        <div class="post-body">
-                            <h3><a href="#">Building Trust Through Clear Shipping Support</a></h3>
-                            <div class="post-meta">
-                                <ul>
-                                    <li><a href="#">HOD /</a></li>
-                                    <li><a href="#"> 2024</a></li>
-                                </ul>
-                            </div>
-                            <div class="post-readmore">
-                                <a href="#">Read More</a>
-                            </div>
-                        </div>
-                        <!-- Post Body End -->
-                    </div>
-                    <!-- Post Item End -->
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- latest Posts section End -->        
 
     <!-- Main Footer Start  -->
-    <footer class="main-footer">
-        <!-- Mega Footer Start -->
-        <div class="mega-footer">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-4 col-md-6 col-12">
-                        <!-- Footer About Start -->
-                        <div class="footer-about">
-                            <!-- Footer Heading Start -->
-                            <div class="footer-heading">
-                                <figure>
-                                    <span class="brand-mark brand-mark-footer"><span class="brand-initials" aria-hidden="true"><i class="fa-solid fa-paw"></i></span><span class="brand-name">Lancaster <small>Pet Movers</small></span></span>
-                                </figure>
-                            </div>
-                            <!-- Footer Heading End -->
-
-                            <!-- Footer Content Start -->
-                            <div class="footer-content">
-                                <p>We help you navigate shipping with clear advice and coordinated transport.</p>
-                            </div>
-                            <!-- Footer Content End -->
-
-                            <!-- Footer Social Link Start -->
-                            <div class="footer-social-link">
-                                <ul>
-                                    <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
-                                    <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
-                                    <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li> 
-                                </ul>
-                            </div>
-                            <!-- Footer Social Link End -->
-                        </div>  
-                        <!-- Footer About End -->                         
-                    </div>
-
-                    <div class="col-lg-2 col-md-6 col-12">
-                        <!-- Footer links Start -->
-                        <div class="footer-links">
-                            <div class="footer-info-heading">
-                                <h2>Quick Links</h2>
-                            </div>
-                            <ul>
-                                <li><a href="index.html">Home</a></li>
-                                <li><a href="about-us.html">About Us</a></li>
-                               <li><a href="service.html">Services</a></li>
-                                <li><a href="reviews.html">Reviews</a></li>
-                                <li><a href="locations.html">Locations</a></li>
-                                <li><a href="/track">Track</a></li>
-                                <li><a href="contact.html">Contact Us</a></li>
-                            </ul>
-                        </div>
-                        <!-- Footer links End -->
-                    </div>                        
-
-                    <div class="col-lg-3 col-md-6 col-12">
-                        <!-- Footer Contact Info Start -->
-                        <div class="footer-contact-info">
-                            <!-- footer info heading Start -->
-                            <div class="footer-info-heading">
-                                <h2>Contact Us</h2>
-                            </div>
-                            <!-- footer info heading End -->
-
-                            <!-- Footer Contact Info Box Start -->
-                            <div class="footer-contact-box">
-                                <div class="footer-info-box">
-                                    <div class="icon-box">
-                                        <i class="fa-regular fa-envelope"></i>
-                                    </div>
-
-                                    <p><%= business.email %></p>
-                                </div>
-
-                                <div class="footer-info-box">
-                                    <div class="icon-box"><i class="fa-solid fa-location-dot"></i></div>
-                                    <p><a href="locations.html">United States &middot; Australia &middot; United Kingdom &middot; New Zealand &middot; Global</a></p>
-                                </div>
-
-                              
-
-                              
-                            </div>
-                            <!-- Footer Contact Info Box End -->
-                        </div>
-                    </div>
-                    <!-- Footer Contact Info End -->
-
-                    <!-- Subscribe Newsletters Start  -->
-                    <div class="col-lg-3 col-md-6 col-12">
-                        <!-- footer info heading Start -->
-                        <div class="footer-info-heading">
-                            <h2>Newsletter</h2>
-                        </div>
-                        <!-- footer info heading End -->
-
-                        <!-- Newsletters Content Start -->
-                        <div class="newsletters-content">
-                            <p>Sign up for shipping news, service updates, and practical logistics insights.</p>
-                        </div>
-                        <!-- Newsletters Content End -->
-
-                        <!-- Newsletters Form Start -->
-                        <div class="newsletters-form">
-                            <form id="newslettersForm" action="/subscribe" method="post" class="mail-box"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <div class="row no-gutters">
-                                    <div class="form-group col-11">
-                                        <input type="email" name="email" class="form-control" placeholder="Your email address" required>
-                                    </div>
-                                    <div class="col-1">
-                                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <!-- Newsletters Form End -->
-                    </div>
-                    <!-- Subscribe Newsletters End  -->
-                </div>
-            </div>
-        </div>
-        <!-- Mega Footer End -->
-    </footer>
-    <!-- Main footer End -->
-
-    <!-- Footer Copyright Section Start -->
-    <div class="footer-copyright-links">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 col-md-7 col-12">
-                    <!-- Footer Copyright Content Start -->
-                    <div class="footer-copyright">
-                        <p>Copyright <%= year %>  <b style="color: rgb(18, 24, 30);"><%= business.name %>.</b> All rights reserved.</p>
-                    </div>
-                    <!-- Footer Copyright Content End -->
-                </div>
-                <div class="col-lg-6 col-md-5 col-12">
-                    <!-- Footer Policy Links Start -->
-                    <div class="footer-policy-links">
-                        <ul>
-                            <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                            <li><a href="terms-of-service.html">Terms of Service</a></li>
-                        </ul>
-                    </div>
-                    <!-- Footer Policy Links End -->
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Footer Copyright Section End -->
+    <%- include('../partials/site-footer') %>
     
 
     <!-- Jquery Library File -->

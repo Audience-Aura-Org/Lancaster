@@ -153,3 +153,6 @@ details.doc-group > summary { cursor: pointer; list-style: revert; }
 [data-docs-for][hidden] { display: none !important; }
 .doc-picker .doc-check { align-items: center; }
 .doc-picker .doc-check input { margin-top: 0; }
+
+/* Headings: Quicksand (matches the public site) */
+h1, h2, h3, .panel h2, .dash-card h2, .admin-head h1, .kind-card strong, .logo { font-family: "Quicksand", "Poppins", sans-serif; }

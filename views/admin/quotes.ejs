@@ -5,15 +5,10 @@
 </div>
 
 <form class="filters" method="get">
-  <input type="search" name="q" value="<%= filter.q %>" placeholder="Search name, email, reference, pet, item…" aria-label="Search">
+  <input type="search" name="q" value="<%= filter.q %>" placeholder="Search name, email, reference, pet…" aria-label="Search">
   <select name="status" data-autosubmit aria-label="Status">
     <option value="">All statuses</option>
     <% Object.entries(domain.QUOTE_STATUSES).forEach(([k, l]) => { %><option value="<%= k %>" <%= filter.status === k ? 'selected' : '' %>><%= l %></option><% }) %>
-  </select>
-  <select name="type" data-autosubmit aria-label="Pet or item">
-    <option value="">Pets &amp; items</option>
-    <option value="pet" <%= filter.type === 'pet' ? 'selected' : '' %>>Pets only</option>
-    <option value="item" <%= filter.type === 'item' ? 'selected' : '' %>>Items only</option>
   </select>
   <button class="btn btn-dark btn-sm" type="submit">Filter</button>
 </form>
@@ -21,11 +16,10 @@
 <section class="panel table-wrap">
   <% if (!rows.length) { %><div class="empty">No quote requests match.</div><% } else { %>
   <table class="table">
-    <thead><tr><th>Type</th><th>Customer</th><th>Reference</th><th>Service</th><th>Route</th><th>Date</th><th>Status</th><th>Received</th><th><span class="sr-only">Actions</span></th></tr></thead>
+    <thead><tr><th>Customer</th><th>Reference</th><th>Service</th><th>Route</th><th>Date</th><th>Status</th><th>Received</th><th><span class="sr-only">Actions</span></th></tr></thead>
     <tbody>
     <% rows.forEach((q) => { %>
       <tr>
-        <td data-label="Type"><%- include('_kind', { kindService: q.service_type, kindSmall: true }) %></td>
         <td data-label="Customer"><a class="row-link" href="/admin/quotes/<%= q.id %>"><%= q.customer_name %></a><br><small class="muted"><%= q.customer_email %></small></td>
         <td data-label="Reference"><%= q.ref %></td>
         <td data-label="Service"><%= domain.SERVICE_TYPES[q.service_type] ? domain.SERVICE_TYPES[q.service_type].short : q.service_type %></td>

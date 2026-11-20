@@ -33,10 +33,10 @@ function createApp() {
         frameSrc: ["'self'", ...chat.filter((u) => u.startsWith('https'))],
         formAction: ["'self'"],
         frameAncestors: ["'none'"],
-        upgradeInsecureRequests: config.isProd ? [] : null,
+        upgradeInsecureRequests: config.isProd && config.baseUrl.startsWith('https:') ? [] : null,
       },
     },
-    hsts: config.isProd,
+    hsts: config.isProd && config.baseUrl.startsWith('https:'),
   }));
 
   const publicDir = path.join(__dirname, '..', 'public');
@@ -52,7 +52,7 @@ function createApp() {
     resave: false,
     saveUninitialized: false,
     rolling: true,
-    cookie: { httpOnly: true, sameSite: 'lax', secure: config.isProd, maxAge: 8 * 60 * 60 * 1000 },
+    cookie: { httpOnly: true, sameSite: 'lax', secure: config.isProd ? 'auto' : false, maxAge: 8 * 60 * 60 * 1000 },
   }));
 
   // Only start a session (and set a cookie) on pages that need a form token.
