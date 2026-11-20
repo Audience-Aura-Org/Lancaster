@@ -165,6 +165,27 @@ const DOCUMENTS = {
   ],
 };
 
+/** How a payment was received (recorded by staff; the website never takes payments itself). */
+const PAYMENT_METHODS = {
+  card: 'Card',
+  bank_transfer: 'Bank transfer',
+  check: 'Check',
+  cash: 'Cash',
+  other: 'Other',
+};
+
+/** Paid / Partly paid / Unpaid / No price, from the agreed total and the payments so far. */
+function paymentSummary(total, payments) {
+  const paid = Math.round(payments.reduce((t, p) => t + Number(p.amount || 0), 0) * 100) / 100;
+  const agreed = total == null ? null : Math.round(Number(total) * 100) / 100;
+  const balance = agreed == null ? null : Math.max(0, Math.round((agreed - paid) * 100) / 100);
+  let status = 'unpaid';
+  if (agreed == null || agreed <= 0) status = paid > 0 ? 'paid' : 'no_price';
+  else if (paid >= agreed) status = 'paid';
+  else if (paid > 0) status = 'partial';
+  return { total: agreed, paid, balance, status, label: { paid: 'Paid', partial: 'Partly paid', unpaid: 'Unpaid', no_price: 'No price set' }[status] };
+}
+
 /** Extra documents staff can pick from (on top of each service's standard list). */
 const EXTRA_DOCUMENTS = {
   pet: [
@@ -236,5 +257,5 @@ module.exports = {
   SERVICE_TYPES, SERVICE_BY_SLUG, PET_SERVICES, FREIGHT_SERVICES, isFreight, isAir,
   SHIPMENT_KINDS, kindOf, parseKind, PACKAGE_TYPES,
   PET_TYPES, CARGO, ITEM_LABELS, QUOTE_STATUSES, BOOKING_STATUSES, BOOKING_FLOW, DOCUMENTS, EXTRA_DOCUMENTS,
-  documentOptions, resolveDocuments, label, itemName,
+  documentOptions, resolveDocuments, label, itemName, PAYMENT_METHODS, paymentSummary,
 };

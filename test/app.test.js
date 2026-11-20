@@ -292,6 +292,23 @@ test('owner can add staff; staff cannot manage users', async () => {
   assert.equal((await staff.get('/admin/users')).status, 403);
 });
 
+test('button addresses never show Not found (signed in or after signing in)', async () => {
+  // Opening a POST-only action address while signed in goes to its page
+  const admin = await login();
+  const q = await svc.createQuote({ name: 'Nf', email: 'nf@example.com' }, { service_type: 'domestic_ground', pet_type: 'dog', origin: 'A', destination: 'B' }, { notifyCustomer: false, notifyStaff: false });
+  let r = await admin.get(`/admin/quotes/${q.id}/send-quote`);
+  assert.equal(r.status, 302);
+  assert.equal(r.location, `/admin/quotes/${q.id}`);
+  // Clicking a button while signed out, then signing in, lands on the quote page (not the action)
+  const c = client();
+  const page = await c.get('/admin/login');
+  const token = page.text.match(/name="_csrf" value="([^"]+)"/)[1];
+  r = await c.post(`/admin/quotes/${q.id}/send-quote`, { _csrf: token, amount: '10' });
+  assert.equal(r.location, '/admin/login');
+  r = await c.form('/admin/login', '/admin/login', { email: 'owner@example.com', password: 'correct-horse-battery' });
+  assert.equal(r.location, `/admin/quotes/${q.id}`);
+});
+
 test('logout ends the session', async () => {
   const c = await login();
   const page = await c.get('/admin');
@@ -735,4 +752,64 @@ test('sample data script adds and removes sample shipments', () => {
   assert.equal(db.get().prepare(`SELECT COUNT(*) n FROM email_log WHERE to_email LIKE '%example.com' AND to_email IN (SELECT email FROM customers WHERE notes = 'SAMPLE DATA')`).get().n, 0, 'no emails to sample customers');
   execFileSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'sample-data.js'), '--remove'], { env, encoding: 'utf8' });
   assert.equal(n(), 0);
+});
+
+test('payments: part payment, mark paid, PAID invoice email, remove payment', async () => {
+  const admin = await login();
+  const customer = svc.upsertCustomer({ name: 'Pay Test', email: 'pay@example.com' });
+  const b = svc.createBooking({ customer_id: customer.id, service_type: 'domestic_air', pet_type: 'dog', pet_name: 'Rex',
+    pet_count: 1, origin: 'Lancaster, PA', destination: 'Denver, CO', total_amount: 1200, documents: [] });
+  const page = `/admin/bookings/${b.id}`;
+  const invoices = () => emails().filter((m) => m.template === 'invoice' && m.booking_id === b.id);
+
+  let p = await admin.get(page);
+  assert.match(p.text, /id="payments"/);
+  assert.match(p.text, /pay-unpaid/);
+  assert.match(p.text, /Mark paid \(\$1,200\.00\)/);
+  assert.match((await admin.get('/admin/bookings')).text, /pay-unpaid/);
+
+  // Part payment: no invoice yet; invoice page not available
+  let r = await admin.form(page, `${page}/payments`, { amount: '200', method: 'card', reference: 'R-1', paid_on: '2026-11-01', send_invoice: 'on' });
+  assert.equal(r.location, `${page}#payments`);
+  assert.equal(svc.getPaymentSummary(b.id).status, 'partial');
+  assert.equal(invoices().length, 0);
+  assert.equal((await admin.get(`${page}/invoice`)).status, 302);
+  // Invalid amount is rejected
+  await admin.form(page, `${page}/payments`, { amount: '-5', method: 'card' });
+  assert.equal(svc.getPayments(b.id).length, 1);
+
+  // Mark paid records the balance and emails a PAID invoice
+  r = await admin.form(page, `${page}/payments/full`, { method: 'bank_transfer' });
+  const s = svc.getPaymentSummary(b.id);
+  assert.deepEqual([s.status, s.paid, s.balance], ['paid', 1200, 0]);
+  assert.equal(svc.getPayments(b.id)[1].amount, 1000);
+  assert.equal(invoices().length, 1);
+  const inv = invoices()[0];
+  assert.match(inv.subject, /^Invoice INV-\d{4}-\d{4}: paid in full/);
+  const row = db.get().prepare('SELECT invoice_number, invoice_sent_at FROM bookings WHERE id = ?').get(b.id);
+  assert.ok(row.invoice_number && row.invoice_sent_at);
+
+  p = await admin.get(page);
+  assert.match(p.text, /Paid in full\./);
+  assert.match(p.text, new RegExp(row.invoice_number));
+  const printable = await admin.get(`${page}/invoice`);
+  assert.equal(printable.status, 200);
+  assert.match(printable.text, />PAID</);
+  assert.match(printable.text, /\$1,200\.00/);
+  assert.match((await admin.get(`/admin/customers/${customer.id}`)).text, /pay-paid/);
+
+  // Resend keeps the same invoice number
+  await admin.form(page, `${page}/invoice/send`, {});
+  assert.equal(invoices().length, 2);
+  assert.equal(db.get().prepare('SELECT invoice_number FROM bookings WHERE id = ?').get(b.id).invoice_number, row.invoice_number);
+
+  // Removing a payment reopens the balance; invoice can no longer be sent
+  const pid = svc.getPayments(b.id)[1].id;
+  await admin.form(page, `${page}/payments/${pid}/delete`, {});
+  assert.equal(svc.getPaymentSummary(b.id).status, 'partial');
+  await admin.form(page, `${page}/invoice/send`, {});
+  assert.equal(invoices().length, 2);
+  // Payments go with a deleted booking
+  svc.deleteBooking(b.id);
+  assert.equal(db.get().prepare('SELECT COUNT(*) n FROM payments WHERE booking_id = ?').get(b.id).n, 0);
 });

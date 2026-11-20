@@ -66,10 +66,10 @@ const safetyText = (t) => `${B().name} will never ask you to pay with gift cards
 
 /* ---------------------------------------------------------- components */
 
-const P = (html, extra = '') => `<p style="margin:0 0 14px;font-family:${FONT};font-size:15px;line-height:1.65;color:#374151;${extra}">${html}</p>`;
+const P = (html, extra = '') => `<p style="margin:0 0 14px;font-family:${FONT};font-size:13px;line-height:1.65;color:#374151;${extra}">${html}</p>`;
 
 /** Section title */
-const H2 = (text, t) => `<h2 style="margin:26px 0 12px;font-family:${HFONT};font-size:16px;font-weight:600;color:#111827;">
+const H2 = (text, t) => `<h2 style="margin:26px 0 12px;font-family:${HFONT};font-size:14px;font-weight:600;color:#111827;">
   <span style="display:inline-block;width:4px;height:16px;background:${t.accent};border-radius:2px;vertical-align:-2px;margin-right:8px;"></span>${esc(text)}</h2>`;
 
 /** "At a glance": the key facts in a two-column grid (stacks on phones). */
@@ -77,7 +77,7 @@ function glance(rows, t) {
   const items = rows.filter(([, v]) => v != null && v !== '');
   const cells = items.map(([k, v]) => `<td class="glance-cell" width="50%" style="padding:12px 16px;vertical-align:top;">
       <div style="font-family:${FONT};font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#6b7280;">${esc(k)}</div>
-      <div style="margin-top:4px;font-family:${FONT};font-size:16px;font-weight:600;color:#111827;line-height:1.35;">${esc(v)}</div>
+      <div style="margin-top:4px;font-family:${FONT};font-size:14px;font-weight:600;color:#111827;line-height:1.35;">${esc(v)}</div>
     </td>`);
   const trs = [];
   for (let i = 0; i < cells.length; i += 2) trs.push(`<tr>${cells[i]}${cells[i + 1] || '<td class="glance-cell" width="50%"></td>'}</tr>`);
@@ -92,8 +92,8 @@ const without = (rows, labels) => rows.filter(([k]) => !labels.includes(k));
 function detailsCard(rows, t, title) {
   const body = rows.filter(([, v]) => v != null && v !== '').map(([k, v], i) => `
     <tr>
-      <td style="padding:11px 0;${i ? 'border-top:1px solid ' + t.tintBorder + ';' : ''}font-family:${FONT};font-size:13px;color:#6b7280;width:38%;vertical-align:top;">${esc(k)}</td>
-      <td style="padding:11px 0;${i ? 'border-top:1px solid ' + t.tintBorder + ';' : ''}font-family:${FONT};font-size:14px;font-weight:600;color:#111827;text-align:right;vertical-align:top;">${esc(v)}</td>
+      <td style="padding:11px 0;${i ? 'border-top:1px solid ' + t.tintBorder + ';' : ''}font-family:${FONT};font-size:12px;color:#6b7280;width:38%;vertical-align:top;">${esc(k)}</td>
+      <td style="padding:11px 0;${i ? 'border-top:1px solid ' + t.tintBorder + ';' : ''}font-family:${FONT};font-size:13px;font-weight:600;color:#111827;text-align:right;vertical-align:top;">${esc(v)}</td>
     </tr>`).join('');
   return `${title ? H2(title, t) : ''}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${t.tint};border:1px solid ${t.tintBorder};border-radius:14px;">
@@ -105,10 +105,10 @@ function detailsCard(rows, t, title) {
 function button(url, text, t) {
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto 8px;">
     <tr><td align="center" bgcolor="${t.accent}" style="border-radius:999px;background:${t.accent};">
-      <a href="${esc(url)}" style="display:inline-block;padding:15px 34px;font-family:${FONT};font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px;">${esc(text)} &rarr;</a>
+      <a href="${esc(url)}" style="display:inline-block;padding:15px 34px;font-family:${FONT};font-size:13px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px;">${esc(text)} &rarr;</a>
     </td></tr>
   </table>
-  <p style="margin:0;text-align:center;font-family:${FONT};font-size:12px;color:#9ca3af;">Or open: <a href="${esc(url)}" style="color:${t.accent};word-break:break-all;">${esc(url)}</a></p>`;
+  <p style="margin:0;text-align:center;font-family:${FONT};font-size:11px;color:#9ca3af;">Or open: <a href="${esc(url)}" style="color:${t.accent};word-break:break-all;">${esc(url)}</a></p>`;
 }
 
 /** Document checklist: received = green tick, outstanding = accent ring */
@@ -117,11 +117,11 @@ function checklist(docs, t) {
     <tr>
       <td width="34" style="padding:10px 0;${i ? 'border-top:1px solid #eef0f3;' : ''}vertical-align:top;">
         ${d.received
-    ? `<span style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:#16a34a;color:#ffffff;font-size:13px;text-align:center;font-family:${FONT};">&#10003;</span>`
+    ? `<span style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:#16a34a;color:#ffffff;font-size:12px;text-align:center;font-family:${FONT};">&#10003;</span>`
     : `<span style="display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid ${t.accent};"></span>`}
       </td>
-      <td style="padding:10px 0;${i ? 'border-top:1px solid #eef0f3;' : ''}font-family:${FONT};font-size:14px;line-height:1.5;color:${d.received ? '#6b7280' : '#111827'};">
-        ${esc(d.label)}${d.received ? ' <span style="color:#16a34a;font-size:12px;font-weight:600;">Received</span>' : ' <span style="color:' + t.accent + ';font-size:12px;font-weight:600;">Needed</span>'}
+      <td style="padding:10px 0;${i ? 'border-top:1px solid #eef0f3;' : ''}font-family:${FONT};font-size:13px;line-height:1.5;color:${d.received ? '#6b7280' : '#111827'};">
+        ${esc(d.label)}${d.received ? ' <span style="color:#16a34a;font-size:11px;font-weight:600;">Received</span>' : ' <span style="color:' + t.accent + ';font-size:11px;font-weight:600;">Needed</span>'}
       </td>
     </tr>`).join('');
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:14px;">
@@ -131,7 +131,7 @@ function checklist(docs, t) {
 /** Coloured callout box */
 function callout(html, t, icon = '') {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 0;background:${t.soft};border-radius:14px;">
-    <tr><td style="padding:18px 20px;font-family:${FONT};font-size:14px;line-height:1.6;color:#1f2937;">${icon ? `<span style="font-size:18px;margin-right:6px;">${icon}</span>` : ''}${html}</td></tr></table>`;
+    <tr><td style="padding:18px 20px;font-family:${FONT};font-size:13px;line-height:1.6;color:#1f2937;">${icon ? `<span style="font-size:15px;margin-right:6px;">${icon}</span>` : ''}${html}</td></tr></table>`;
 }
 
 /** Progress tracker for booking emails (steps not actually reached are shown as skipped). */
@@ -146,7 +146,7 @@ function tracker(status, reached, t) {
       ? `background:${t.accent};color:#ffffff;border:3px solid ${t.soft};`
       : done ? `background:${t.accentDark};color:#ffffff;border:3px solid #ffffff;` : 'background:#ffffff;color:#9ca3af;border:2px solid #d1d5db;';
     return `<td width="20%" align="center" style="padding:0 2px;vertical-align:top;">
-      <div style="width:30px;height:30px;line-height:30px;border-radius:50%;${circle}font-family:${FONT};font-size:13px;font-weight:700;margin:0 auto;">${done ? '&#10003;' : i + 1}</div>
+      <div style="width:30px;height:30px;line-height:30px;border-radius:50%;${circle}font-family:${FONT};font-size:12px;font-weight:700;margin:0 auto;">${done ? '&#10003;' : i + 1}</div>
       <div style="margin-top:6px;font-family:${FONT};font-size:11px;line-height:1.3;color:${current ? '#111827' : '#6b7280'};font-weight:${current ? 600 : 400};">${SHORT[s]}</div>
     </td>`;
   }).join('');
@@ -178,7 +178,7 @@ function layout({ theme: t, preheader = '', eyebrow = '', heading, intro = '', b
   @media only screen and (max-width: 620px) {
     .container { width: 100% !important; }
     .px { padding-left: 22px !important; padding-right: 22px !important; }
-    .hero-title { font-size: 26px !important; }
+    .hero-title { font-size: 19px !important; }
     .stack { display: block !important; width: 100% !important; text-align: left !important; }
     .glance td { display: block !important; width: 100% !important; }
   }
@@ -195,9 +195,9 @@ function layout({ theme: t, preheader = '', eyebrow = '', heading, intro = '', b
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
       <td class="stack" style="vertical-align:middle;">
         <a href="${esc(site)}" style="text-decoration:none;">
-          <span style="display:inline-block;width:38px;height:38px;line-height:38px;border-radius:11px;background:#ef233c;text-align:center;font-family:${FONT};font-size:19px;font-weight:700;color:#ffffff;vertical-align:middle;">L</span>
+          <span style="display:inline-block;width:38px;height:38px;line-height:38px;border-radius:11px;background:#ef233c;text-align:center;font-family:${FONT};font-size:16px;font-weight:700;color:#ffffff;vertical-align:middle;">L</span>
           <span style="display:inline-block;vertical-align:middle;margin-left:10px;font-family:${FONT};">
-            <span style="display:block;font-size:17px;font-weight:700;color:#111827;line-height:1.1;">Lancaster</span>
+            <span style="display:block;font-size:15px;font-weight:700;color:#111827;line-height:1.1;">Lancaster</span>
             <span style="display:block;font-size:10px;font-weight:600;letter-spacing:3px;color:#ef233c;">PET MOVERS</span>
           </span>
         </a>
@@ -214,11 +214,11 @@ function layout({ theme: t, preheader = '', eyebrow = '', heading, intro = '', b
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
           <td style="vertical-align:top;">
             ${eyebrow ? `<p style="margin:0 0 10px;font-family:${FONT};font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.8);">${esc(eyebrow)}</p>` : ''}
-            <h1 class="hero-title" style="margin:0;font-family:${HFONT};font-size:30px;line-height:1.2;font-weight:700;color:#ffffff;">${esc(heading)}</h1>
-            ${intro ? `<p style="margin:12px 0 0;font-family:${FONT};font-size:15px;line-height:1.6;color:rgba(255,255,255,.9);">${esc(intro)}</p>` : ''}
+            <h1 class="hero-title" style="margin:0;font-family:${HFONT};font-size:22px;line-height:1.2;font-weight:700;color:#ffffff;">${esc(heading)}</h1>
+            ${intro ? `<p style="margin:12px 0 0;font-family:${FONT};font-size:13px;line-height:1.6;color:rgba(255,255,255,.9);">${esc(intro)}</p>` : ''}
           </td>
           <td width="74" align="right" style="vertical-align:top;">
-            <div style="width:60px;height:60px;line-height:60px;border-radius:50%;background:#ffffff;text-align:center;font-size:28px;">${t.emoji}</div>
+            <div style="width:60px;height:60px;line-height:60px;border-radius:50%;background:#ffffff;text-align:center;font-size:22px;">${t.emoji}</div>
           </td>
         </tr></table>
       </td></tr>
@@ -232,7 +232,7 @@ function layout({ theme: t, preheader = '', eyebrow = '', heading, intro = '', b
       ${staff ? '' : `<!-- Help strip -->
       <tr><td class="px" style="padding:0 40px 30px;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #eef0f3;"><tr>
-          <td style="padding-top:22px;font-family:${FONT};font-size:14px;line-height:1.6;color:#374151;">
+          <td style="padding-top:22px;font-family:${FONT};font-size:13px;line-height:1.6;color:#374151;">
             <strong style="color:#111827;">Need help?</strong> Just reply to this email${b.phone ? ` or call us on <a href="tel:${esc(b.phone.replace(/[^\d+]/g, ''))}" style="color:${t.accent};font-weight:600;">${esc(b.phone)}</a>` : ''}. A real person on our team will get back to you.
           </td>
         </tr></table>
@@ -243,7 +243,7 @@ function layout({ theme: t, preheader = '', eyebrow = '', heading, intro = '', b
   ${staff ? '' : `<!-- Safety -->
   <tr><td style="padding:18px 6px 0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;"><tr>
-      <td width="44" style="padding:16px 0 16px 18px;vertical-align:top;font-size:20px;">&#128737;&#65039;</td>
+      <td width="44" style="padding:16px 0 16px 18px;vertical-align:top;font-size:17px;">&#128737;&#65039;</td>
       <td style="padding:16px 18px 16px 8px;font-family:${FONT};font-size:12.5px;line-height:1.6;color:#4b5563;"><strong style="color:#111827;">Staying safe.</strong> ${esc(safetyText(t))}</td>
     </tr></table>
   </td></tr>`}
@@ -251,15 +251,15 @@ function layout({ theme: t, preheader = '', eyebrow = '', heading, intro = '', b
   <!-- Footer -->
   <tr><td style="padding:18px 6px 0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#20252d" style="background:#20252d;border-radius:18px;"><tr>
-      <td class="px" style="padding:26px 30px;font-family:${FONT};font-size:13px;line-height:1.7;color:#c7cbd3;">
-        <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#ffffff;">${esc(b.name)}</p>
+      <td class="px" style="padding:26px 30px;font-family:${FONT};font-size:12px;line-height:1.7;color:#c7cbd3;">
+        <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#ffffff;">${esc(b.name)}</p>
         <p style="margin:0 0 14px;">Safe, caring pet transport by road and air. Every pet travels like family.</p>
         <p style="margin:0 0 14px;">
           <a href="${esc(site)}" style="color:#ffffff;font-weight:600;">Website</a>
           &nbsp;&middot;&nbsp; <a href="${esc(site)}/track" style="color:#ffffff;font-weight:600;">${t === THEMES.item ? 'Track a shipment' : 'Track your pet'}</a>
           &nbsp;&middot;&nbsp; <a href="${esc(site)}/contact.html" style="color:#ffffff;font-weight:600;">Contact</a>
         </p>
-        <p style="margin:0;font-size:12px;color:#9aa1ad;">${esc(b.address)} &middot; <a href="mailto:${esc(b.email)}" style="color:#9aa1ad;">${esc(b.email)}</a>${b.phone ? ' &middot; ' + esc(b.phone) : ''}</p>
+        <p style="margin:0;font-size:11px;color:#9aa1ad;">${esc(b.address)} &middot; <a href="mailto:${esc(b.email)}" style="color:#9aa1ad;">${esc(b.email)}</a>${b.phone ? ' &middot; ' + esc(b.phone) : ''}</p>
       </td>
     </tr></table>
   </td></tr>
@@ -368,9 +368,9 @@ function quoteReady({ customer, quote }) {
       ${P('Thank you for your patience. Here is your written quote.')}
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 4px;background:${t.tint};border:1px solid ${t.tintBorder};border-radius:16px;">
         <tr><td align="center" style="padding:24px 20px;">
-          <p style="margin:0;font-family:${FONT};font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#6b7280;">Quoted price</p>
-          <p style="margin:6px 0 0;font-family:${FONT};font-size:40px;font-weight:700;line-height:1.1;color:${t.accentDark};">${esc(money(quote.quoted_amount))}</p>
-          <p style="margin:6px 0 0;font-family:${FONT};font-size:13px;color:#6b7280;">${esc(label(SERVICE_TYPES, quote.service_type))}</p>
+          <p style="margin:0;font-family:${FONT};font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#6b7280;">Quoted price</p>
+          <p style="margin:6px 0 0;font-family:${FONT};font-size:30px;font-weight:700;line-height:1.1;color:${t.accentDark};">${esc(money(quote.quoted_amount))}</p>
+          <p style="margin:6px 0 0;font-family:${FONT};font-size:12px;color:#6b7280;">${esc(label(SERVICE_TYPES, quote.service_type))}</p>
         </td></tr>
       </table>
       ${glance([['Reference', quote.ref], [item ? 'Ship date' : 'Travel date', fmtDate(quote.travel_date)]], t)}
@@ -487,7 +487,7 @@ function bookingStatus({ customer, booking, documents = [], reached = null }) {
       const got = documents.length - outstanding.length;
       extraHtml += `${H2(`Document checklist · ${got} of ${documents.length} received`, t)}${checklist(documents, t)}`;
       if (outstanding.length) {
-        extraHtml += P('Send documents by replying to this email with them attached.', 'margin-top:14px;font-size:13px;color:#6b7280;');
+        extraHtml += P('Send documents by replying to this email with them attached.', 'margin-top:14px;font-size:12px;color:#6b7280;');
         extraText += `\n\nDocuments we still need:\n- ${outstanding.map((d) => d.label).join('\n- ')}`;
       }
     } else {
@@ -510,10 +510,10 @@ function bookingStatus({ customer, booking, documents = [], reached = null }) {
           extraHtml += `
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0 0;background:#111827;border-radius:16px;">
             <tr><td style="padding:22px 24px;font-family:${FONT};color:#ffffff;">
-              <p style="margin:0;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#9ca3af;">&#9992;&#65039; Track the flight with ${esc(a.airline.name)}</p>
-              <p style="margin:8px 0 4px;font-size:26px;font-weight:700;letter-spacing:1px;">${esc(a.formatted)}</p>
-              <p style="margin:0 0 14px;font-size:13px;color:#d1d5db;">Enter this air waybill number on the airline's cargo site for live flight status.</p>
-              <a href="${esc(a.airline.url)}" style="display:inline-block;padding:10px 18px;border-radius:999px;background:#ffffff;color:#111827;font-size:13px;font-weight:600;">Open ${esc(a.airline.name)} &rarr;</a>
+              <p style="margin:0;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#9ca3af;">&#9992;&#65039; Track the flight with ${esc(a.airline.name)}</p>
+              <p style="margin:8px 0 4px;font-size:20px;font-weight:700;letter-spacing:1px;">${esc(a.formatted)}</p>
+              <p style="margin:0 0 14px;font-size:12px;color:#d1d5db;">Enter this air waybill number on the airline's cargo site for live flight status.</p>
+              <a href="${esc(a.airline.url)}" style="display:inline-block;padding:10px 18px;border-radius:999px;background:#ffffff;color:#111827;font-size:12px;font-weight:600;">Open ${esc(a.airline.name)} &rarr;</a>
             </td></tr>
           </table>`;
           extraText += `\n\nTrack the flight directly with ${a.airline.name} (${a.airline.url}) using air waybill ${a.formatted}.`;
@@ -565,7 +565,7 @@ function documentsReminder({ customer, booking, documents }) {
       ${P(esc(intro))}
       ${glance([['Documents needed', String(outstanding.length)], [isFreight(booking.service_type) ? 'Ship date' : 'Travel date', fmtDate(booking.travel_date)], ['Reference', booking.ref], ['Service', label(SERVICE_TYPES, booking.service_type)]], t)}
       ${H2('Still needed', t)}${checklist(outstanding, t)}
-      ${P('Reply to this email with the documents attached, or contact us if you have questions.', 'margin-top:14px;font-size:13px;color:#6b7280;')}
+      ${P('Reply to this email with the documents attached, or contact us if you have questions.', 'margin-top:14px;font-size:12px;color:#6b7280;')}
       ${detailsCard(without(tripRows(booking), ['Reference', 'Service', 'Travel date', 'Ship date']), t, t.detailsTitle)}`,
     cta: { url: statusUrl(booking), label: 'View full checklist' },
   });
@@ -573,7 +573,82 @@ function documentsReminder({ customer, booking, documents }) {
   return { subject, html, text };
 }
 
+/* ---------------------------------------------------------------- invoice */
+
+/**
+ * Invoice for a booking that has been paid in full. Sent automatically when the last
+ * payment is recorded; the same HTML is the printable invoice in the admin.
+ */
+function invoice({ customer, booking, payments, summary, invoiceNumber }) {
+  const t = themeFor(booking.service_type);
+  const item = t === THEMES.item;
+  const { PAYMENT_METHODS } = require('../domain');
+  const lastPaid = payments.length ? payments[payments.length - 1].paid_on : null;
+  const description = item
+    ? `${label(SERVICE_TYPES, booking.service_type)}: ${booking.cargo_description || 'shipment'}`
+    : `${label(SERVICE_TYPES, booking.service_type)}: ${booking.pet_name ? booking.pet_name + (booking.pet_type ? ' (' + label(ITEM_LABELS, booking.pet_type) + ')' : '') : label(ITEM_LABELS, booking.pet_type)}`;
+  const route = `${booking.origin} → ${booking.destination}${booking.travel_date ? ', ' + fmtDate(booking.travel_date) : ''}`;
+  const cell = 'padding:12px 0;border-top:1px solid #eef0f3;font-family:' + FONT + ';font-size:13px;';
+  const payRows = payments.map((p) => `<tr>
+      <td style="${cell}color:#374151;">${esc(fmtDate(p.paid_on))}</td>
+      <td style="${cell}color:#374151;">${esc(PAYMENT_METHODS[p.method] || p.method)}${p.reference ? ` <span style="color:#6b7280;">· ${esc(p.reference)}</span>` : ''}</td>
+      <td align="right" style="${cell}font-weight:600;color:#111827;">${esc(money(p.amount))}</td></tr>`).join('');
+
+  const body = `
+    ${P(`Hi ${esc(firstName(customer.name))},`)}
+    ${P(`Thank you for your payment. This is your invoice for ${esc(tripName(booking))}. No further payment is due.`)}
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 10px;background:#ecfdf3;border:1px solid #b7ebcd;border-radius:16px;">
+      <tr><td align="center" style="padding:22px 20px;">
+        <span style="display:inline-block;padding:6px 18px;border:2px solid #16a34a;border-radius:8px;font-family:${FONT};font-size:14px;font-weight:700;letter-spacing:4px;color:#16a34a;">PAID</span>
+        <p style="margin:12px 0 0;font-family:${FONT};font-size:28px;font-weight:700;line-height:1.1;color:#14532d;">${esc(money(summary.paid))}</p>
+        <p style="margin:6px 0 0;font-family:${FONT};font-size:12px;color:#166534;">Paid in full${lastPaid ? ' on ' + esc(fmtDate(lastPaid)) : ''}</p>
+      </td></tr>
+    </table>
+
+    ${glance([['Invoice number', invoiceNumber], ['Booking reference', booking.ref], ['Invoice date', fmtDate(new Date().toISOString().slice(0, 10))], ['Status', 'Paid in full']], t)}
+
+    ${H2('Invoice', t)}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="padding:0 0 8px;font-family:${FONT};font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#6b7280;">Description</td>
+        <td align="right" style="padding:0 0 8px;font-family:${FONT};font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#6b7280;">Amount</td>
+      </tr>
+      <tr>
+        <td style="${cell}color:#111827;"><strong>${esc(description)}</strong><br><span style="color:#6b7280;font-size:12px;">${esc(route)}</span></td>
+        <td align="right" style="${cell}font-weight:600;color:#111827;vertical-align:top;">${esc(money(summary.total != null ? summary.total : summary.paid))}</td>
+      </tr>
+      <tr><td style="${cell}color:#6b7280;">Total</td><td align="right" style="${cell}font-weight:700;color:#111827;">${esc(money(summary.total != null ? summary.total : summary.paid))}</td></tr>
+      <tr><td style="${cell}color:#6b7280;">Paid</td><td align="right" style="${cell}font-weight:700;color:#16a34a;">${esc(money(summary.paid))}</td></tr>
+      <tr><td style="${cell}color:#111827;font-weight:600;">Balance due</td><td align="right" style="${cell}font-size:14px;font-weight:700;color:#111827;">${esc(money(summary.balance || 0))}</td></tr>
+    </table>
+
+    ${payments.length ? `${H2('Payments received', t)}
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${payRows}</table>` : ''}
+
+    ${H2('Billed to', t)}
+    ${P(`${esc(customer.name)}<br>${esc(customer.email)}${customer.phone ? '<br>' + esc(customer.phone) : ''}${customer.address ? '<br>' + esc(customer.address).replace(/\n/g, '<br>') : ''}`, 'font-size:13px;')}
+    ${P('Please keep this invoice for your records.', 'font-size:12px;color:#6b7280;')}`;
+
+  const subject = `Invoice ${invoiceNumber}: paid in full (${booking.ref})`;
+  const html = layout({
+    theme: t,
+    preheader: `Invoice ${invoiceNumber}: ${money(summary.paid)} paid in full. Thank you!`,
+    eyebrow: `Invoice · ${invoiceNumber}`,
+    heading: 'Payment received, thank you',
+    intro: `Your invoice for ${tripName(booking)} is paid in full.`,
+    body,
+  });
+  const text = `Hi ${customer.name},\n\nThank you for your payment. Invoice ${invoiceNumber} for ${tripName(booking)} is PAID IN FULL.\n\n`
+    + `Invoice number: ${invoiceNumber}\nBooking reference: ${booking.ref}\n${description}\n${route}\n\n`
+    + `Total: ${money(summary.total != null ? summary.total : summary.paid)}\nPaid: ${money(summary.paid)}\nBalance due: ${money(summary.balance || 0)}\n\n`
+    + (payments.length ? 'Payments received:\n' + payments.map((p) => `- ${fmtDate(p.paid_on)}  ${PAYMENT_METHODS[p.method] || p.method}${p.reference ? ' (' + p.reference + ')' : ''}  ${money(p.amount)}`).join('\n') : '')
+    + textFooter(t);
+  return { subject, html, text };
+}
+
 module.exports = {
+  invoice,
   quoteReceived, quoteAdminNotify, quoteReady, contactAdminNotify, contactReceived,
   bookingStatus, documentsReminder, STATUS_COPY, esc, fmtDate, money, THEMES,
 };

@@ -133,6 +133,68 @@
       </dl>
     </section>
 
+    <% const usd = (n) => '$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); %>
+    <section class="panel" id="payments">
+      <h2><i class="fa-solid fa-receipt"></i> Payments <span class="pay-pill pay-<%= pay.status %>"><%= pay.label %></span></h2>
+      <div class="pay-summary">
+        <div><span>Agreed price</span><strong><%= pay.total != null ? usd(pay.total) : 'Not set' %></strong></div>
+        <div><span>Paid</span><strong class="pay-good"><%= usd(pay.paid) %></strong></div>
+        <div><span>Balance</span><strong class="<%= pay.balance ? 'pay-due' : '' %>"><%= pay.balance != null ? usd(pay.balance) : '-' %></strong></div>
+      </div>
+      <% if (pay.total == null) { %><p class="muted" style="font-size:13px">Set the agreed price in Transport details to track the balance.</p><% } %>
+
+      <% if (payments.length) { %>
+      <ul class="pay-list">
+        <% payments.forEach((p) => { %>
+        <li>
+          <div><strong><%= usd(p.amount) %></strong> <span class="muted">&middot; <%= PAYMENT_METHODS[p.method] || p.method %><%= p.reference ? ' · ' + p.reference : '' %></span>
+            <small><%= p.paid_on %><%= p.admin_name ? ' · recorded by ' + p.admin_name : '' %><%= p.note ? ' · ' + p.note : '' %></small></div>
+          <form method="post" action="/admin/bookings/<%= booking.id %>/payments/<%= p.id %>/delete" data-confirm="Remove the <%= usd(p.amount) %> payment from <%= p.paid_on %>?">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="doc-remove" type="submit" title="Remove payment" aria-label="Remove payment"><i class="fa-solid fa-xmark"></i></button>
+          </form>
+        </li>
+        <% }) %>
+      </ul>
+      <% } %>
+
+      <% if (pay.status === 'paid') { %>
+        <div class="pay-done"><i class="fa-solid fa-circle-check"></i>
+          <span><strong>Paid in full.</strong> Invoice <%= booking.invoice_number || '' %><%= booking.invoice_sent_at ? ' emailed ' + booking.invoice_sent_at + ' UTC' : ' not emailed yet' %>.</span></div>
+        <div class="form-actions">
+          <a class="btn btn-outline btn-sm" href="/admin/bookings/<%= booking.id %>/invoice" target="_blank" rel="noopener"><i class="fa-solid fa-print"></i> View / print invoice</a>
+          <form method="post" action="/admin/bookings/<%= booking.id %>/invoice/send" class="inline-form" data-once data-confirm="Email the invoice to <%= booking.customer_email %>?">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="btn btn-outline btn-sm" type="submit"><i class="fa-solid fa-paper-plane"></i> <%= booking.invoice_sent_at ? 'Resend invoice' : 'Email invoice' %></button>
+          </form>
+        </div>
+      <% } else { %>
+        <% if (pay.total > 0) { %>
+        <form method="post" action="/admin/bookings/<%= booking.id %>/payments/full" class="pay-full" data-once data-confirm="Mark <%= booking.ref %> as paid in full (<%= usd(pay.balance) %>) and email the invoice to <%= booking.customer_email %>?">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <select name="method" aria-label="Paid by"><% Object.entries(PAYMENT_METHODS).forEach(([k, l]) => { %><option value="<%= k %>"><%= l %></option><% }) %></select>
+          <button class="btn btn-primary btn-sm" type="submit"><i class="fa-solid fa-check"></i> Mark paid (<%= usd(pay.balance) %>)</button>
+        </form>
+        <p class="hint" style="margin-top:6px">Records the balance as received today and emails a PAID invoice.</p>
+        <% } %>
+        <details class="doc-choose" style="margin-top:12px">
+          <summary><i class="fa-solid fa-plus"></i> Record a part payment</summary>
+          <form method="post" action="/admin/bookings/<%= booking.id %>/payments" data-once style="margin-top:10px">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="form-grid cols-2">
+              <div class="field"><label>Amount (USD)</label><input type="number" name="amount" step="0.01" min="0.01" required value="<%= pay.balance || '' %>"></div>
+              <div class="field"><label>Paid by</label><select name="method"><% Object.entries(PAYMENT_METHODS).forEach(([k, l]) => { %><option value="<%= k %>"><%= l %></option><% }) %></select></div>
+              <div class="field"><label>Date received</label><input type="date" name="paid_on" value="<%= new Date().toISOString().slice(0, 10) %>"></div>
+              <div class="field"><label>Reference</label><input type="text" name="reference" maxlength="120" placeholder="e.g. receipt or transfer ID"></div>
+              <div class="field span-2"><label>Note</label><input type="text" name="note" maxlength="500" placeholder="Optional"></div>
+            </div>
+            <label class="check" style="margin-top:8px"><input type="checkbox" name="send_invoice" checked> Email the invoice if this completes the payment</label>
+            <div class="form-actions"><button class="btn btn-dark btn-sm" type="submit">Save payment</button></div>
+          </form>
+        </details>
+      <% } %>
+    </section>
+
     <section class="panel">
       <h2><i class="fa-solid fa-clock-rotate-left"></i> Status history</h2>
       <ul class="timeline-mini">

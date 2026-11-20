@@ -32,7 +32,11 @@ function flash(req, res, next) {
 
 function requireAdmin(req, res, next) {
   if (!req.session.adminId) {
-    req.session.returnTo = req.originalUrl;
+    // Only come back to real pages after signing in. A button action (POST) would
+    // otherwise be re-opened as a page and show "Not found"; go to its parent page instead.
+    req.session.returnTo = req.method === 'GET'
+      ? req.originalUrl
+      : req.originalUrl.replace(/^(\/admin\/(?:quotes|bookings|customers)\/\d+)\/.*$/, '$1').replace(/^\/admin\/(?!quotes\/\d|bookings\/\d|customers\/\d).*/, '/admin');
     return res.redirect('/admin/login');
   }
   const admin = db.get().prepare('SELECT id, email, name, role, active FROM admins WHERE id = ?').get(req.session.adminId);

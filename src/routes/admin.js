@@ -9,7 +9,8 @@ const dashboard = require('../dashboard');
 const { readShipment } = require('../shipment-form');
 const awb = require('../awb');
 const { requireAdmin, requireOwner, audit } = require('../security');
-const { SERVICE_TYPES, PET_TYPES, QUOTE_STATUSES, BOOKING_STATUSES, DOCUMENTS, PACKAGE_TYPES, resolveDocuments, isFreight, isAir, CARGO, parseKind } = require('../domain');
+const tpl = require('../emails/templates');
+const { SERVICE_TYPES, PET_TYPES, QUOTE_STATUSES, BOOKING_STATUSES, DOCUMENTS, PACKAGE_TYPES, resolveDocuments, isFreight, isAir, CARGO, parseKind, PAYMENT_METHODS, paymentSummary } = require('../domain');
 
 const router = express.Router();
 const PER_PAGE_OPTIONS = [10, 25, 50, 100];
@@ -292,8 +293,9 @@ router.get('/bookings', (req, res) => {
   const d = db.get();
   const total = d.prepare(`SELECT COUNT(*) n FROM bookings b JOIN customers c ON c.id = b.customer_id ${w}`).get(...params).n;
   const pg = pageInfo(req, total);
-  const rows = d.prepare(`SELECT b.*, c.name customer_name FROM bookings b JOIN customers c ON c.id = b.customer_id
+  const rows = d.prepare(`SELECT b.*, c.name customer_name, (SELECT COALESCE(SUM(amount), 0) FROM payments p WHERE p.booking_id = b.id) paid_amount FROM bookings b JOIN customers c ON c.id = b.customer_id
     ${w} ORDER BY b.id DESC LIMIT ? OFFSET ?`).all(...params, pg.limit, pg.offset);
+  for (const r of rows) r.pay = paymentSummary(r.total_amount, [{ amount: r.paid_amount }]);
   res.render('admin/bookings', { title: 'Bookings', rows, ...pg, filter: { status, service, type: typeParam(req.query.type), q } });
 });
 
@@ -352,6 +354,7 @@ router.get('/bookings/:id', (req, res, next) => {
     title: `Booking ${booking.ref}`, booking,
     documents: svc.getDocuments(booking.id), events: svc.getEvents(booking.id), notes: svc.getNotes('booking', booking.id), emails,
     awbResult: booking.airline_awb ? awb.parse(booking.airline_awb) : null,
+    payments: svc.getPayments(booking.id), pay: svc.getPaymentSummary(booking.id), PAYMENT_METHODS,
   });
 });
 
@@ -530,6 +533,96 @@ router.post('/bookings/:id/resend', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+/* ------------------------------------------------------- booking payments */
+
+const payPage = (id) => `/admin/bookings/${id}#payments`;
+const today = () => new Date().toISOString().slice(0, 10);
+
+function paidFlash(req, r) {
+  if (!r.becamePaid) return;
+  if (r.invoiceSent === true) req.flash('success', 'Paid in full. The invoice was emailed to the customer.');
+  else if (r.invoiceSent === false) req.flash('error', 'Paid in full, but the invoice email failed. Check the email log, then use "Resend invoice".');
+  else req.flash('success', 'Paid in full. No invoice was emailed (you can send it from the Payments panel).');
+}
+
+router.post('/bookings/:id/payments', async (req, res, next) => {
+  try {
+    const booking = bookingOr404(req);
+    const amount = v.num(req.body.amount, { min: 0.01, max: 100000000 });
+    const method = v.oneOf(req.body.method, PAYMENT_METHODS);
+    const paidOn = v.date(req.body.paid_on) || today();
+    if (!amount || amount <= 0) { req.flash('error', 'Enter the amount received.'); return res.redirect(payPage(booking.id)); }
+    if (!method) { req.flash('error', 'Choose how it was paid.'); return res.redirect(payPage(booking.id)); }
+    const r = await svc.recordPayment(booking.id, {
+      amount: Math.round(amount * 100) / 100, method, paidOn,
+      reference: v.str(req.body.reference, 120), note: v.str(req.body.note, 500),
+    }, { adminId: req.admin.id, sendInvoiceWhenPaid: req.body.send_invoice === 'on' });
+    audit(req, 'payment_recorded', 'booking', booking.id, `${amount.toFixed(2)} · ${PAYMENT_METHODS[method]}`);
+    req.flash('success', `Payment of $${amount.toFixed(2)} recorded.`);
+    paidFlash(req, r);
+    res.redirect(payPage(booking.id));
+  } catch (e) { next(e); }
+});
+
+/** Record the outstanding balance as one payment, i.e. "mark as paid". */
+router.post('/bookings/:id/payments/full', async (req, res, next) => {
+  try {
+    const booking = bookingOr404(req);
+    const summary = svc.getPaymentSummary(booking.id);
+    if (summary.total == null || summary.total <= 0) {
+      req.flash('error', 'Set the total price in Travel details first, then mark it as paid.');
+      return res.redirect(payPage(booking.id));
+    }
+    if (summary.status === 'paid') { req.flash('success', 'This booking is already paid in full.'); return res.redirect(payPage(booking.id)); }
+    const method = v.oneOf(req.body.method, PAYMENT_METHODS) || 'other';
+    const r = await svc.recordPayment(booking.id, {
+      amount: summary.balance, method, paidOn: v.date(req.body.paid_on) || today(), reference: v.str(req.body.reference, 120),
+    }, { adminId: req.admin.id, sendInvoiceWhenPaid: req.body.send_invoice !== 'off' });
+    audit(req, 'marked_paid', 'booking', booking.id, `${summary.balance.toFixed(2)} · ${PAYMENT_METHODS[method]}`);
+    paidFlash(req, r);
+    res.redirect(payPage(booking.id));
+  } catch (e) { next(e); }
+});
+
+router.post('/bookings/:id/payments/:pid/delete', (req, res) => {
+  const booking = bookingOr404(req);
+  const pid = v.int(req.params.pid, { min: 1 });
+  if (pid && svc.deletePayment(booking.id, pid)) {
+    audit(req, 'payment_removed', 'booking', booking.id, `payment #${pid}`);
+    req.flash('success', 'Payment removed.');
+  } else {
+    req.flash('error', 'That payment no longer exists.');
+  }
+  res.redirect(payPage(booking.id));
+});
+
+router.post('/bookings/:id/invoice/send', async (req, res, next) => {
+  try {
+    const booking = bookingOr404(req);
+    if (svc.getPaymentSummary(booking.id).status !== 'paid') {
+      req.flash('error', 'The invoice can be sent once the booking is paid in full.');
+      return res.redirect(payPage(booking.id));
+    }
+    const sent = await svc.sendInvoice(booking.id);
+    audit(req, 'invoice_sent', 'booking', booking.id);
+    req.flash(sent ? 'success' : 'error', sent ? 'Invoice emailed to the customer.' : 'Invoice email failed. Check the email log.');
+    res.redirect(payPage(booking.id));
+  } catch (e) { next(e); }
+});
+
+/** Printable invoice (the same design the customer receives). */
+router.get('/bookings/:id/invoice', (req, res, next) => {
+  const booking = svc.getBooking(idParam(req));
+  if (!booking) return next(notFound());
+  const summary = svc.getPaymentSummary(booking.id);
+  if (summary.status !== 'paid') { req.flash('error', 'The invoice is available once the booking is paid in full.'); return res.redirect(payPage(booking.id)); }
+  const mail = tpl.invoice({
+    customer: svc.getCustomer(booking.customer_id), booking: svc.getBooking(booking.id),
+    payments: svc.getPayments(booking.id), summary, invoiceNumber: svc.ensureInvoiceNumber(booking.id),
+  });
+  res.type('html').send(mail.html);
+});
+
 router.post('/bookings/:id/delete', (req, res) => {
   const id = idParam(req);
   const deleted = svc.deleteBooking(id);
@@ -578,7 +671,8 @@ router.get('/customers/:id', (req, res, next) => {
   res.render('admin/customer', {
     title: customer.name, customer,
     quotes: d.prepare('SELECT * FROM quote_requests WHERE customer_id = ? ORDER BY id DESC').all(customer.id),
-    bookings: d.prepare('SELECT * FROM bookings WHERE customer_id = ? ORDER BY id DESC').all(customer.id),
+    bookings: d.prepare('SELECT b.*, (SELECT COALESCE(SUM(amount), 0) FROM payments p WHERE p.booking_id = b.id) paid_amount FROM bookings b WHERE customer_id = ? ORDER BY id DESC').all(customer.id)
+      .map((b) => ({ ...b, pay: paymentSummary(b.total_amount, [{ amount: b.paid_amount }]) })),
     notes: svc.getNotes('customer', customer.id),
   });
 });
@@ -728,6 +822,12 @@ router.get('/activity', requireOwner, (req, res) => {
         ELSE 0 END AS record_exists
     FROM audit_log l LEFT JOIN admins a ON a.id = l.admin_id ORDER BY l.id DESC LIMIT ? OFFSET ?`).all(limit, offset);
   res.render('admin/activity', { title: 'Activity log', rows, ...pageInfo(req, total), filter: {} });
+});
+
+/* Button actions (send quote, change status, delete...) are POST-only. If one is opened as a
+   page (typed in, bookmarked, or after signing in), show its quote/booking/customer page instead of 404. */
+router.get(/^\/(quotes|bookings|customers)\/(\d+)\/.+$/, (req, res) => {
+  res.redirect(`/admin/${req.params[0]}/${req.params[1]}`);
 });
 
 module.exports = router;

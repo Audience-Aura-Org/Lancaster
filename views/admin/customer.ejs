@@ -6,11 +6,11 @@
 <div class="admin-grid cols-2">
   <div>
     <section class="panel table-wrap">
-      <h2><i class="fa-solid fa-suitcase-rolling"></i> Bookings</h2>
+      <h2><i class="fa-solid fa-suitcase-rolling"></i> Bookings<% const owed = bookings.reduce((t, b) => t + (b.pay.balance || 0), 0); if (owed > 0) { %> <span class="pay-pill pay-unpaid">$<%= owed.toLocaleString('en-US', { minimumFractionDigits: 2 }) %> outstanding</span><% } %></h2>
       <% if (!bookings.length) { %><div class="empty">No bookings.</div><% } else { %>
-      <table class="table"><thead><tr><th>Booking</th><th>Route</th><th>Date</th><th>Status</th></tr></thead><tbody>
+      <table class="table"><thead><tr><th>Booking</th><th>Route</th><th>Date</th><th>Status</th><th>Payment</th></tr></thead><tbody>
         <% bookings.forEach((b) => { %>
-          <tr><td data-label="Booking"><a class="row-link" href="/admin/bookings/<%= b.id %>"><%= b.ref %></a></td><td data-label="Route"><%= b.origin %> &rarr; <%= b.destination %></td><td data-label="Date"><%= b.travel_date || 'TBC' %></td><td data-label="Status"><span class="status status-<%= b.status %>"><%= domain.label(domain.BOOKING_STATUSES, b.status) %></span></td></tr>
+          <tr><td data-label="Booking"><a class="row-link" href="/admin/bookings/<%= b.id %>"><%= b.ref %></a></td><td data-label="Route"><%= b.origin %> &rarr; <%= b.destination %></td><td data-label="Date"><%= b.travel_date || 'TBC' %></td><td data-label="Status"><span class="status status-<%= b.status %>"><%= domain.label(domain.BOOKING_STATUSES, b.status) %></span></td><td data-label="Payment"><span class="pay-pill pay-<%= b.pay.status %>"><%= b.pay.label %></span><% if (b.pay.total != null) { %><small class="pay-sub">$<%= b.pay.paid.toLocaleString('en-US', { minimumFractionDigits: 2 }) %> of $<%= b.pay.total.toLocaleString('en-US', { minimumFractionDigits: 2 }) %></small><% } %></td></tr>
         <% }) %>
       </tbody></table>
       <% } %>

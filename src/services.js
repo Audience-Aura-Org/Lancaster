@@ -3,7 +3,7 @@ const db = require('./db');
 const mailer = require('./mailer');
 const tpl = require('./emails/templates');
 const config = require('./config');
-const { DOCUMENTS, BOOKING_STATUSES } = require('./domain');
+const { DOCUMENTS, BOOKING_STATUSES, paymentSummary } = require('./domain');
 const { makeRef } = require('./security');
 
 /* -------------------------------------------------------------- customers */
@@ -206,6 +206,64 @@ function deleteQuote(id) {
   });
 }
 
+/* --------------------------------------------------------------- payments */
+
+function getPayments(bookingId) {
+  return db.get().prepare(`SELECT p.*, a.name AS admin_name FROM payments p LEFT JOIN admins a ON a.id = p.admin_id
+    WHERE p.booking_id = ? ORDER BY p.paid_on, p.id`).all(bookingId);
+}
+
+/** { total, paid, balance, status, label } for a booking */
+function getPaymentSummary(bookingId) {
+  const b = db.get().prepare('SELECT total_amount FROM bookings WHERE id = ?').get(bookingId);
+  return paymentSummary(b ? b.total_amount : null, getPayments(bookingId));
+}
+
+/** Invoice number INV-<year>-0001, assigned once per booking. */
+function ensureInvoiceNumber(bookingId) {
+  const d = db.get();
+  const b = d.prepare('SELECT invoice_number FROM bookings WHERE id = ?').get(bookingId);
+  if (b.invoice_number) return b.invoice_number;
+  const year = new Date().getUTCFullYear();
+  const last = d.prepare("SELECT invoice_number FROM bookings WHERE invoice_number LIKE ? ORDER BY invoice_number DESC LIMIT 1").get(`INV-${year}-%`);
+  const next = last ? Number(last.invoice_number.split('-')[2]) + 1 : 1;
+  const num = `INV-${year}-${String(next).padStart(4, '0')}`;
+  d.prepare('UPDATE bookings SET invoice_number = ? WHERE id = ?').run(num, bookingId);
+  return num;
+}
+
+/** Email the invoice (marked PAID when fully paid). Returns true when sent. */
+async function sendInvoice(bookingId) {
+  const invoiceNumber = ensureInvoiceNumber(bookingId);
+  const booking = getBooking(bookingId);
+  const customer = getCustomer(booking.customer_id);
+  const payments = getPayments(bookingId);
+  const summary = getPaymentSummary(bookingId);
+  const mail = tpl.invoice({ customer, booking, payments, summary, invoiceNumber });
+  const ok = await mailer.send({ to: customer.email, ...mail, template: 'invoice', bookingId });
+  if (ok) db.get().prepare(`UPDATE bookings SET invoice_sent_at = datetime('now') WHERE id = ?`).run(bookingId);
+  return ok;
+}
+
+/**
+ * Record a payment. When it completes the balance and `sendInvoiceWhenPaid` is true,
+ * the invoice is emailed. Returns { summary, becamePaid, invoiceSent }.
+ */
+async function recordPayment(bookingId, { amount, method, reference, paidOn, note }, { adminId, sendInvoiceWhenPaid = true } = {}) {
+  const before = getPaymentSummary(bookingId);
+  db.get().prepare('INSERT INTO payments (booking_id, amount, method, reference, paid_on, note, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)')
+    .run(bookingId, amount, method, reference || null, paidOn, note || null, adminId || null);
+  const summary = getPaymentSummary(bookingId);
+  const becamePaid = before.status !== 'paid' && summary.status === 'paid';
+  let invoiceSent = null;
+  if (becamePaid && sendInvoiceWhenPaid) invoiceSent = await sendInvoice(bookingId);
+  return { summary, becamePaid, invoiceSent };
+}
+
+function deletePayment(bookingId, paymentId) {
+  return db.get().prepare('DELETE FROM payments WHERE id = ? AND booking_id = ?').run(paymentId, bookingId).changes > 0;
+}
+
 /* ------------------------------------------------------------------ notes */
 
 function addNote(entity, entityId, adminId, body) {
@@ -232,5 +290,6 @@ async function createContactMessage(msg) {
 module.exports = {
   upsertCustomer, getCustomer, createQuote, getQuote, sendQuote,
   createBooking, getBooking, getDocuments, getEvents, setBookingStatus, sendBookingStatusEmail,
-  sendDocumentsReminder, findBookingForCustomer, normalizeRef, findByTrackingNumber, deleteBooking, deleteQuote, addNote, getNotes, createContactMessage,
+  sendDocumentsReminder, findBookingForCustomer, normalizeRef, findByTrackingNumber, deleteBooking, deleteQuote, addNote,
+  getPayments, getPaymentSummary, recordPayment, deletePayment, sendInvoice, ensureInvoiceNumber, getNotes, createContactMessage,
 };

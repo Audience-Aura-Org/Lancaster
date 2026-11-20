@@ -168,6 +168,21 @@ function migrate(d) {
     if (!has(table, 'declared_value')) d.exec(`ALTER TABLE ${table} ADD COLUMN declared_value REAL`);
     if (!has(table, 'special_needs')) d.exec(`ALTER TABLE ${table} ADD COLUMN special_needs TEXT`);
   }
+  // Payments recorded against a booking, and the invoice sent once it is paid in full
+  if (!has('bookings', 'invoice_number')) d.exec('ALTER TABLE bookings ADD COLUMN invoice_number TEXT');
+  if (!has('bookings', 'invoice_sent_at')) d.exec('ALTER TABLE bookings ADD COLUMN invoice_sent_at TEXT');
+  d.exec(`CREATE TABLE IF NOT EXISTS payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    booking_id INTEGER NOT NULL REFERENCES bookings(id) ON DELETE CASCADE,
+    amount REAL NOT NULL CHECK (amount > 0),
+    method TEXT NOT NULL,
+    reference TEXT,
+    paid_on TEXT NOT NULL,
+    note TEXT,
+    admin_id INTEGER REFERENCES admins(id),
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`);
+  d.exec('CREATE INDEX IF NOT EXISTS idx_payments_booking ON payments(booking_id)');
   d.exec(`CREATE TABLE IF NOT EXISTS subscribers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL UNIQUE COLLATE NOCASE,
