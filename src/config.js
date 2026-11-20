@@ -31,7 +31,10 @@ module.exports = {
     pass: env.SMTP_PASS || '',
     from: env.MAIL_FROM || `${env.BUSINESS_NAME || 'Lancaster Pet Movers'} <${env.BUSINESS_EMAIL || 'info@lancasterpetmovers.com'}>`,
   },
-  // Tawk.to live chat property, e.g. "64ab12cd34ef/1h2j3k4l" (Dashboard > Administration > Chat Widget). Empty = no chat.
-  tawkProperty: /^[A-Za-z0-9]+\/[A-Za-z0-9]+$/.test(env.TAWK_PROPERTY || '') ? env.TAWK_PROPERTY : '',
+  // Tawk.to live chat property (Dashboard > Administration > Chat Widget). Set TAWK_PROPERTY to override, or TAWK_PROPERTY=off to hide the chat.
+  tawkProperty: (() => {
+    const t = env.TAWK_PROPERTY ? env.TAWK_PROPERTY : '6b000f4e09b9513c8f6ff222/1k7s3njkc';
+    return /^[A-Za-z0-9]+\/[A-Za-z0-9]+$/.test(t) ? t : '';
+  })(),
   outboxDir: path.resolve(__dirname, '..', env.OUTBOX_DIR || 'data/outbox'),
 };
