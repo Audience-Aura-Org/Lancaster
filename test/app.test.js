@@ -813,3 +813,22 @@ test('payments: part payment, mark paid, PAID invoice email, remove payment', as
   svc.deleteBooking(b.id);
   assert.equal(db.get().prepare('SELECT COUNT(*) n FROM payments WHERE booking_id = ?').get(b.id).n, 0);
 });
+
+test('ADMIN_EMAIL / ADMIN_PASSWORD give a working owner login on a fresh database', async () => {
+  const { ensureAdmin } = require('../src/admin-bootstrap');
+  const env = { ADMIN_EMAIL: 'Boss@Example.com', ADMIN_PASSWORD: 'Prod-pass-123' };
+  assert.equal(ensureAdmin(env), 'created');
+  assert.equal(ensureAdmin(env), 'unchanged');
+  let c = client();
+  let r = await c.form('/admin/login', '/admin/login', { email: 'boss@example.com', password: 'Prod-pass-123' });
+  assert.equal(r.status, 302);
+  // Forgotten or changed password and a disabled account are restored from the settings
+  db.get().prepare(`UPDATE admins SET password_hash = 'x', active = 0 WHERE email = 'boss@example.com'`).run();
+  assert.equal(ensureAdmin(env), 'updated');
+  r = await client().form('/admin/login', '/admin/login', { email: 'boss@example.com', password: 'Prod-pass-123' });
+  assert.equal(r.status, 302);
+  // Missing or unsafe settings do nothing
+  assert.equal(ensureAdmin({}), null);
+  assert.equal(ensureAdmin({ ADMIN_EMAIL: 'x@example.com', ADMIN_PASSWORD: 'short' }), null);
+  assert.equal(db.get().prepare(`SELECT COUNT(*) n FROM admins WHERE email = 'x@example.com'`).get().n, 0);
+});

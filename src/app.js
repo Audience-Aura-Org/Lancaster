@@ -12,6 +12,7 @@ const tpl = require('./emails/templates');
 
 function createApp() {
   db.open();
+  require('./admin-bootstrap').ensureAdmin(); // ADMIN_EMAIL / ADMIN_PASSWORD -> working owner login
   const app = express();
 
   app.set('view engine', 'ejs');

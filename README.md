@@ -26,6 +26,7 @@ Running it again for the same email resets that account's password.
   `/pet-transport.html`, `/reviews.html`, `/locations.html`, `/faqs.html`, `/contact.html`, `/privacy-policy.html` and `/terms-of-service.html`
 - The theme's contact form saves the message and emails both sides. The newsletter forms on every page save subscribers (see **Admin > Subscribers**, with CSV export).
 - **Quote form** (`/quote`): pet or freight, with different fields for each. It saves the request, emails the customer a confirmation and notifies staff. The services' "Request a Quote" buttons open it with the service already selected.
+- Production admin sign-in: set `ADMIN_EMAIL` and `ADMIN_PASSWORD` on the host; the owner account is created or restored at startup.
 - Live chat (Tawk.to) is on by default on every public page. Set `TAWK_PROPERTY` to another property ID to change it, or to `off` to hide it.
 - **Track page** with two lookups:
   - *Booking status*: needs the booking reference **and** the customer's email. Shows the progress steps and the document checklist.
