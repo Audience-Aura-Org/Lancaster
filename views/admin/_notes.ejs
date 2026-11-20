@@ -1,0 +1,16 @@
+<section class="panel" id="notes">
+  <h2><i class="fa-solid fa-note-sticky"></i> Internal notes</h2>
+  <p class="muted" style="font-size:13px;margin-top:-8px">Only visible to staff.</p>
+  <form method="post" action="/admin/notes">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="entity" value="<%= noteEntity %>">
+    <input type="hidden" name="entity_id" value="<%= noteEntityId %>">
+    <textarea name="body" rows="3" maxlength="4000" placeholder="Add a note…" required style="min-height:80px"></textarea>
+    <div class="form-actions"><button class="btn btn-dark btn-sm" type="submit">Add note</button></div>
+  </form>
+  <div style="margin-top:14px">
+    <% notes.forEach((n) => { %>
+      <div class="note"><%= n.body %><small><%= n.admin_name || 'System' %> &middot; <%= n.created_at %> UTC</small></div>
+    <% }) %>
+  </div>
+</section>

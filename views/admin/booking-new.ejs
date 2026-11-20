@@ -1,0 +1,44 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <div>
+    <h1><%= kind ? (kind === 'pet' ? 'New pet booking' : 'New item shipment') : 'New booking' %></h1>
+    <div class="sub"><%= kind ? 'For bookings taken by phone or email.' : 'What is being moved?' %> Quote requests can also be converted from the quote page.</div>
+  </div>
+  <a class="btn btn-outline btn-sm" href="<%= kind ? '/admin/bookings/new' : '/admin/bookings' %>"><i class="fa-solid fa-arrow-left"></i> <%= kind ? 'Change type' : 'Bookings' %></a>
+</div>
+
+<% if (!kind) { %>
+  <%- include('_choose-kind', { chooseBase: '/admin/bookings/new', chooseWhat: 'booking' }) %>
+<% } else { %>
+<form class="panel" method="post" action="/admin/bookings/new" data-once>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <% if (Object.keys(errors).length) { %><div class="alert alert-error"><i class="fa-solid fa-circle-exclamation"></i> Please fix the highlighted fields.</div><% } %>
+  <div class="kind-pill kind-<%= kind %>"><i class="fa-solid <%= domain.SHIPMENT_KINDS[kind].icon %>"></i> <%= domain.SHIPMENT_KINDS[kind].label %></div>
+
+  <h2><i class="fa-solid fa-user"></i> Customer</h2>
+  <div class="form-grid cols-2">
+    <%- include('../partials/field', { name: 'name', label: 'Full name', required: true }) %>
+    <%- include('../partials/field', { name: 'email', label: 'Email', type: 'email', required: true, hint: 'Existing customers are matched by email.' }) %>
+    <%- include('../partials/field', { name: 'phone', label: 'Phone', type: 'tel' }) %>
+    <%- include('../partials/field', { name: 'total_amount', label: 'Agreed price (USD)', type: 'number', attrs: 'min="0" step="0.01"' }) %>
+  </div>
+
+  <%- include('_shipment-fields', { kind, values, errors }) %>
+
+  <h2 style="margin-top:24px"><i class="fa-solid fa-file-medical"></i> Documents needed</h2>
+  <input type="hidden" name="docs_present" value="1">
+  <p class="muted" data-docs-hint style="font-size:13px;<%= values.service_type ? 'display:none' : '' %>">Choose a service above to see the documents for that type of shipment.</p>
+  <% Object.entries(domain.SERVICE_TYPES).filter(([, s]) => s.category === kind).forEach(([svc]) => { %>
+    <div data-docs-for="<%= svc %>" <%= values.service_type === svc ? '' : 'hidden' %>>
+      <%- include('_doc-picker', { pickService: svc, pickName: 'docs_' + svc, pickPreselect: true, pickExclude: [], pickCustom: '' }) %>
+    </div>
+  <% }) %>
+  <div class="field" style="margin-top:10px">
+    <label for="docs_custom">Other documents (one per line)</label>
+    <textarea id="docs_custom" name="docs_custom" rows="2" maxlength="2000" style="min-height:64px" placeholder="e.g. Letter from destination employer"></textarea>
+  </div>
+  <label class="check" style="margin-top:18px"><input type="checkbox" name="notify" checked> Email the customer a booking confirmation with their document checklist</label>
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Create <%= kind === 'pet' ? 'pet booking' : 'item shipment' %></button></div>
+</form>
+<% } %>
+<%- include('_bottom') %>

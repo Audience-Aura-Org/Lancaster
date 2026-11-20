@@ -1,0 +1,50 @@
+/* Lancaster Pet Movers: quote form + message page, styled to match the original theme. */
+.lpm-form { background: var(--white-color); border: 1px solid var(--divider-color); border-radius: 20px; padding: 30px; margin-top: 10px; }
+.lpm-form label { display: block; font-weight: 600; font-size: 14px; color: var(--primary-color); margin-bottom: 6px; }
+.lpm-form .form-control { min-height: 50px; border-radius: 10px; border: 1px solid var(--divider-color); padding: 12px 16px; font-size: 15px; box-shadow: none; }
+.lpm-form textarea.form-control { min-height: 110px; }
+.lpm-form .form-control:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(239, 35, 60, .12); }
+.lpm-form .service-section-title { font-size: 20px; margin: 18px 0 14px; }
+.lpm-form .has-error .form-control { border-color: var(--error-color); }
+.lpm-error { color: var(--error-color); font-size: 13px; margin-top: 4px; }
+.lpm-alert { background: #fdecea; color: #8e2a1f; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 14px; }
+.lpm-check { display: flex !important; gap: 10px; align-items: flex-start; font-weight: 400 !important; }
+.lpm-check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent-color); flex: 0 0 auto; }
+.lpm-form [hidden] { display: none !important; }
+
+.lpm-message { max-width: 640px; margin: 0 auto; text-align: center; padding: 20px 0 40px; }
+.lpm-message h1 { font-size: 34px; margin: 14px 0; }
+.lpm-message-icon { width: 76px; height: 76px; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; font-size: 34px; background: #e8f6ee; color: #1f8a54; }
+.lpm-message-icon.is-error { background: #fdecea; color: var(--accent-color); }
+.lpm-badge { display: inline-block; background: var(--secondary-color); border: 1px solid var(--divider-color); padding: 8px 16px; border-radius: 999px; font-weight: 600; }
+.lpm-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 24px; }
+@media (max-width: 767px) {
+  .lpm-form { padding: 20px 16px; }
+  .lpm-message h1 { font-size: 26px; }
+}
+
+/* Quote: step 1 "what are you sending?" */
+.lpm-choose { max-width: 860px; margin: 0 auto; text-align: center; }
+.lpm-choose h1 { font-size: 38px; margin: 6px 0 10px; }
+.lpm-kinds { display: grid; gap: 20px; margin-top: 30px; text-align: left; }
+@media (min-width: 768px) { .lpm-kinds { grid-template-columns: 1fr 1fr; } }
+.lpm-kind { display: flex; flex-direction: column; gap: 8px; padding: 30px; border: 1px solid var(--divider-color); border-radius: 20px; background: var(--white-color); color: var(--text-color); text-decoration: none; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.lpm-kind:hover, .lpm-kind:focus-visible { border-color: var(--accent-color); box-shadow: 0 18px 40px rgba(0,0,0,.08); transform: translateY(-2px); color: var(--text-color); }
+.lpm-kind-icon { width: 60px; height: 60px; border-radius: 16px; display: grid; place-items: center; background: var(--secondary-color); color: var(--accent-color); font-size: 26px; margin-bottom: 6px; }
+.lpm-kind strong { font-size: 24px; color: var(--primary-color); }
+.lpm-kind em { font-style: normal; font-weight: 600; color: var(--accent-color); margin-top: 6px; }
+
+/* Quote: step 2 */
+.lpm-kind-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: var(--secondary-color); color: var(--accent-color); font-weight: 600; font-size: 14px; margin-bottom: 10px; }
+.lpm-switch { display: inline-block; margin-left: 6px; font-weight: 600; color: var(--accent-color); }
+.lpm-services { display: grid; gap: 10px; }
+@media (min-width: 768px) { .lpm-services { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); } }
+.lpm-service { display: block; margin: 0; cursor: pointer; }
+.lpm-service input { position: absolute; opacity: 0; }
+.lpm-service > span { display: flex; flex-direction: column; gap: 4px; height: 100%; padding: 14px 16px; border: 1.5px solid var(--divider-color); border-radius: 12px; background: var(--white-color); transition: border-color .15s, box-shadow .15s; }
+.lpm-service i { color: var(--accent-color); font-size: 18px; }
+.lpm-service strong { color: var(--primary-color); font-size: 15px; }
+.lpm-service small { color: #6b7280; font-size: 12.5px; line-height: 1.4; font-weight: 400; }
+.lpm-service input:checked + span { border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(239, 35, 60, .12); }
+.lpm-service input:focus-visible + span { outline: 3px solid var(--accent-color); outline-offset: 2px; }
+.lpm-services.has-error .lpm-service > span { border-color: var(--error-color); }

@@ -1,0 +1,40 @@
+<%#
+  Document chooser. Params:
+    pickService  - service type key
+    pickName     - checkbox field name (e.g. "docs_domestic_air" or "pick")
+    pickPreselect- true: standard documents are ticked (new booking); false: nothing ticked (adding)
+    pickExclude  - array of {doc_key, label} already on the booking (hidden from the list)
+    pickCustom   - name of the "your own documents" text field, or '' for none
+%>
+<% const exclude = (locals.pickExclude || []);
+   const exKeys = new Set(exclude.map((d) => d.doc_key));
+   const exLabels = new Set(exclude.map((d) => String(d.label).toLowerCase()));
+   const groups = domain.documentOptions(pickService)
+     .map((g) => ({ ...g, items: g.items.filter(([k, l]) => !exKeys.has(k) && !exLabels.has(l.toLowerCase())) }))
+     .filter((g) => g.items.length); %>
+<div class="doc-picker">
+  <% groups.forEach((g, gi) => { %>
+    <% if (g.items[0][2]) { /* standard documents: always shown */ %>
+      <div class="doc-group">
+        <div class="doc-group-title"><%= g.title %><% if (pickPreselect) { %> <span class="muted">(ticked by default)</span><% } %></div>
+        <% g.items.forEach(([k, l]) => { %>
+          <label class="doc-check"><input type="checkbox" name="<%= pickName %>" value="<%= k %>" <%= pickPreselect ? 'checked' : '' %>><span><%= l %></span></label>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <details class="doc-group">
+        <summary class="doc-group-title"><%= g.title %> <span class="muted">(<%= g.items.length %>)</span></summary>
+        <% g.items.forEach(([k, l]) => { %>
+          <label class="doc-check"><input type="checkbox" name="<%= pickName %>" value="<%= k %>"><span><%= l %></span></label>
+        <% }) %>
+      </details>
+    <% } %>
+  <% }) %>
+  <% if (!groups.length) { %><p class="muted" style="font-size:13px">Every suggested document is already on the checklist.</p><% } %>
+  <% if (locals.pickCustom) { %>
+    <div class="field" style="margin-top:10px">
+      <label for="<%= pickCustom %>">Other documents (one per line)</label>
+      <textarea id="<%= pickCustom %>" name="<%= pickCustom %>" rows="2" maxlength="2000" style="min-height:64px" placeholder="e.g. Letter from destination employer"></textarea>
+    </div>
+  <% } %>
+</div>

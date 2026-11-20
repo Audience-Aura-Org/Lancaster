@@ -1,0 +1,44 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <div><h1><%= customer.name %></h1><div class="sub">Customer since <%= customer.created_at.slice(0, 10) %></div></div>
+  <a class="btn btn-outline btn-sm" href="/admin/customers"><i class="fa-solid fa-arrow-left"></i> Customers</a>
+</div>
+<div class="admin-grid cols-2">
+  <div>
+    <section class="panel table-wrap">
+      <h2><i class="fa-solid fa-suitcase-rolling"></i> Bookings</h2>
+      <% if (!bookings.length) { %><div class="empty">No bookings.</div><% } else { %>
+      <table class="table"><thead><tr><th>Booking</th><th>Route</th><th>Date</th><th>Status</th></tr></thead><tbody>
+        <% bookings.forEach((b) => { %>
+          <tr><td data-label="Booking"><a class="row-link" href="/admin/bookings/<%= b.id %>"><%= b.ref %></a></td><td data-label="Route"><%= b.origin %> &rarr; <%= b.destination %></td><td data-label="Date"><%= b.travel_date || 'TBC' %></td><td data-label="Status"><span class="status status-<%= b.status %>"><%= domain.label(domain.BOOKING_STATUSES, b.status) %></span></td></tr>
+        <% }) %>
+      </tbody></table>
+      <% } %>
+    </section>
+    <section class="panel table-wrap">
+      <h2><i class="fa-solid fa-file-signature"></i> Quote requests</h2>
+      <% if (!quotes.length) { %><div class="empty">No quote requests.</div><% } else { %>
+      <table class="table"><thead><tr><th>Request</th><th>Route</th><th>Status</th></tr></thead><tbody>
+        <% quotes.forEach((q) => { %>
+          <tr><td data-label="Request"><a class="row-link" href="/admin/quotes/<%= q.id %>"><%= q.ref %></a></td><td data-label="Route"><%= q.origin %> &rarr; <%= q.destination %></td><td data-label="Status"><span class="status status-<%= q.status %>"><%= domain.label(domain.QUOTE_STATUSES, q.status) %></span></td></tr>
+        <% }) %>
+      </tbody></table>
+      <% } %>
+    </section>
+  </div>
+  <div>
+    <section class="panel">
+      <h2><i class="fa-solid fa-user-pen"></i> Contact details</h2>
+      <form method="post" action="/admin/customers/<%= customer.id %>" class="form-grid">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="field"><label>Name</label><input type="text" name="name" value="<%= customer.name %>" required></div>
+        <div class="field"><label>Email</label><input type="email" name="email" value="<%= customer.email %>" required></div>
+        <div class="field"><label>Phone</label><input type="tel" name="phone" value="<%= customer.phone || '' %>"></div>
+        <div class="field"><label>Address</label><textarea name="address" style="min-height:80px"><%= customer.address || '' %></textarea></div>
+        <button class="btn btn-dark btn-sm" type="submit">Save</button>
+      </form>
+    </section>
+    <%- include('_notes', { noteEntity: 'customer', noteEntityId: customer.id }) %>
+  </div>
+</div>
+<%- include('_bottom') %>

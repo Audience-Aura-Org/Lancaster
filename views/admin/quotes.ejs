@@ -1,0 +1,49 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <div><h1>Quote requests</h1><div class="sub"><%= total %> found</div></div>
+  <a class="btn btn-primary btn-sm" href="/admin/quotes/new"><i class="fa-solid fa-plus"></i> New quote</a>
+</div>
+
+<form class="filters" method="get">
+  <input type="search" name="q" value="<%= filter.q %>" placeholder="Search name, email, reference, pet, item…" aria-label="Search">
+  <select name="status" data-autosubmit aria-label="Status">
+    <option value="">All statuses</option>
+    <% Object.entries(domain.QUOTE_STATUSES).forEach(([k, l]) => { %><option value="<%= k %>" <%= filter.status === k ? 'selected' : '' %>><%= l %></option><% }) %>
+  </select>
+  <select name="type" data-autosubmit aria-label="Pet or item">
+    <option value="">Pets &amp; items</option>
+    <option value="pet" <%= filter.type === 'pet' ? 'selected' : '' %>>Pets only</option>
+    <option value="item" <%= filter.type === 'item' ? 'selected' : '' %>>Items only</option>
+  </select>
+  <button class="btn btn-dark btn-sm" type="submit">Filter</button>
+</form>
+
+<section class="panel table-wrap">
+  <% if (!rows.length) { %><div class="empty">No quote requests match.</div><% } else { %>
+  <table class="table">
+    <thead><tr><th>Type</th><th>Customer</th><th>Reference</th><th>Service</th><th>Route</th><th>Date</th><th>Status</th><th>Received</th><th><span class="sr-only">Actions</span></th></tr></thead>
+    <tbody>
+    <% rows.forEach((q) => { %>
+      <tr>
+        <td data-label="Type"><%- include('_kind', { kindService: q.service_type, kindSmall: true }) %></td>
+        <td data-label="Customer"><a class="row-link" href="/admin/quotes/<%= q.id %>"><%= q.customer_name %></a><br><small class="muted"><%= q.customer_email %></small></td>
+        <td data-label="Reference"><%= q.ref %></td>
+        <td data-label="Service"><%= domain.SERVICE_TYPES[q.service_type] ? domain.SERVICE_TYPES[q.service_type].short : q.service_type %></td>
+        <td data-label="Route"><%= q.origin %> &rarr; <%= q.destination %></td>
+        <td data-label="Travel date"><%= q.travel_date || 'Flexible' %></td>
+        <td data-label="Status"><span class="status status-<%= q.status %>"><%= domain.label(domain.QUOTE_STATUSES, q.status) %></span></td>
+        <td data-label="Received"><%= q.created_at.slice(0, 10) %></td>
+        <td data-label="">
+          <form method="post" action="/admin/quotes/<%= q.id %>/delete" class="inline-form" data-confirm="Permanently delete quote request <%= q.ref %> from <%= q.customer_name %>?<%= q.status === 'converted' ? ' Its booking will be kept.' : '' %> This cannot be undone.">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="btn btn-danger btn-sm" type="submit" title="Delete quote request <%= q.ref %>" aria-label="Delete quote request <%= q.ref %>"><i class="fa-solid fa-trash"></i><span class="del-label"> Delete</span></button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+</section>
+<%- include('_pager') %>
+<%- include('_bottom') %>

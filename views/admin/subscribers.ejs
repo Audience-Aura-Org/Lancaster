@@ -1,0 +1,23 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <div><h1>Newsletter subscribers</h1><div class="sub"><%= total %> from the website newsletter forms</div></div>
+  <a class="btn btn-outline btn-sm" href="/admin/subscribers.csv"><i class="fa-solid fa-download"></i> Export CSV</a>
+</div>
+<section class="panel table-wrap">
+  <% if (!rows.length) { %><div class="empty">No subscribers yet.</div><% } else { %>
+  <table class="table">
+    <thead><tr><th>Email</th><th>Subscribed (UTC)</th><th></th></tr></thead>
+    <tbody>
+    <% rows.forEach((s) => { %>
+      <tr>
+        <td data-label="Email"><%= s.email %></td>
+        <td data-label="Subscribed"><%= s.created_at %></td>
+        <td data-label=""><form method="post" action="/admin/subscribers/<%= s.id %>/delete" class="inline-form" data-confirm="Remove <%= s.email %>?"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="btn btn-danger btn-sm" type="submit">Remove</button></form></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+</section>
+<%- include('_pager') %>
+<%- include('_bottom') %>

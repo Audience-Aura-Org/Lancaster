@@ -1,0 +1,23 @@
+<%- include('_top') %>
+<div class="admin-head"><div><h1>Activity log</h1><div class="sub">Who changed what, and when.</div></div></div>
+<section class="panel table-wrap">
+  <% if (!rows.length) { %><div class="empty">No activity yet.</div><% } else { %>
+  <table class="table">
+    <thead><tr><th>When (UTC)</th><th>Who</th><th>Action</th><th>Record</th><th>Detail</th></tr></thead>
+    <tbody>
+    <% const links = { booking: '/admin/bookings/', quote: '/admin/quotes/', customer: '/admin/customers/' }; %>
+    <% rows.forEach((r) => { %>
+      <tr>
+        <td data-label="When"><%= r.created_at %></td>
+        <td data-label="Who"><%= r.admin_name || '-' %></td>
+        <td data-label="Action"><%= r.action.replace(/_/g, ' ') %></td>
+        <td data-label="Record"><% if (r.entity && links[r.entity] && r.record_exists) { %><a href="<%= links[r.entity] + r.entity_id %>"><%= r.entity %> #<%= r.entity_id %></a><% } else if (r.entity && links[r.entity]) { %><%= r.entity %> #<%= r.entity_id %> <span class="muted">(deleted)</span><% } else { %><%= r.entity || '' %><% } %></td>
+        <td data-label="Detail"><%= r.detail || '' %></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+</section>
+<%- include('_pager') %>
+<%- include('_bottom') %>

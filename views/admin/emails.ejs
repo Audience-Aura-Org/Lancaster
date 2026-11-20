@@ -1,0 +1,22 @@
+<%- include('_top') %>
+<div class="admin-head"><div><h1>Email log</h1><div class="sub">Every email the system has sent or tried to send. "saved to outbox" means SMTP isn't configured yet.</div></div></div>
+<section class="panel table-wrap">
+  <% if (!rows.length) { %><div class="empty">No emails yet.</div><% } else { %>
+  <table class="table">
+    <thead><tr><th>When (UTC)</th><th>To</th><th>Subject</th><th>Template</th><th>Status</th></tr></thead>
+    <tbody>
+    <% rows.forEach((m) => { %>
+      <tr>
+        <td data-label="When"><%= m.created_at %></td>
+        <td data-label="To"><%= m.to_email %></td>
+        <td data-label="Subject"><%= m.subject %><% if (m.booking_id) { %><br><a href="/admin/bookings/<%= m.booking_id %>">booking</a><% } else if (m.quote_id) { %><br><a href="/admin/quotes/<%= m.quote_id %>">quote</a><% } %></td>
+        <td data-label="Template"><code><%= m.template %></code></td>
+        <td data-label="Status"><span class="status status-<%= m.status %>"><%= m.status.replace(/_/g, ' ') %></span><% if (m.error) { %><br><small class="muted"><%= m.error %></small><% } %></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+</section>
+<%- include('_pager') %>
+<%- include('_bottom') %>

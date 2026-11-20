@@ -1,0 +1,13 @@
+<%#
+  Text-like field. Params: name, label, type?, required?, hint?, attrs?, cls?
+%><% const val = values[name] == null ? '' : values[name]; const err = errors[name]; %>
+<div class="field <%= locals.cls || '' %> <%= err ? 'has-error' : '' %>">
+  <label for="f-<%= name %>"><%= label %><% if (locals.required) { %> <span class="req">*</span><% } %></label>
+  <% if ((locals.type || 'text') === 'textarea') { %>
+    <textarea id="f-<%= name %>" name="<%= name %>" <%- locals.attrs || '' %> <% if (err) { %>aria-invalid="true" aria-describedby="e-<%= name %>"<% } %>><%= val %></textarea>
+  <% } else { %>
+    <input id="f-<%= name %>" name="<%= name %>" type="<%= locals.type || 'text' %>" value="<%= val %>" <% if (locals.required) { %>required<% } %> <%- locals.attrs || '' %> <% if (err) { %>aria-invalid="true" aria-describedby="e-<%= name %>"<% } %>>
+  <% } %>
+  <% if (locals.hint) { %><div class="hint"><%= hint %></div><% } %>
+  <% if (err) { %><div class="error" id="e-<%= name %>"><%= err %></div><% } %>
+</div>

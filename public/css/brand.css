@@ -1,0 +1,16 @@
+/* Lancaster Pet Movers: font override on top of the original theme. */
+:root { --default-font: "Poppins", sans-serif; }
+body, h1, h2, h3, h4, h5, h6, p, a, li, input, textarea, select, button { font-family: var(--default-font); }
+.brand-initials .fa-paw { font-size: 20px; }
+
+/* Text wordmark: paw badge + "Lancaster Pet Movers" (header and footer). */
+.brand-mark { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; }
+.brand-initials { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-color); color: var(--white-color);
+  display: inline-grid; place-items: center; flex: 0 0 auto; }
+.brand-name { display: flex; flex-direction: column; font-size: 22px; font-weight: 800; line-height: 1; color: var(--primary-color); letter-spacing: -.01em; }
+.brand-name small { font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; margin-top: 5px; color: var(--accent-color); }
+.brand-mark-footer .brand-name, .main-footer .brand-name { color: var(--white-color); }
+@media only screen and (max-width: 575px) {
+  .brand-initials { width: 38px; height: 38px; }
+  .brand-name { font-size: 18px; }
+}

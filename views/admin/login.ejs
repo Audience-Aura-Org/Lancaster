@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Sign in | <%= business.name %> admin</title>
+  <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/site.css">
+  <link rel="stylesheet" href="/static/css/admin.css">
+<link href="/static/css/zoom.css" rel="stylesheet">
+</head>
+<body class="admin">
+<div class="login-wrap">
+  <div class="login-card">
+    <a class="logo" href="/" style="margin-bottom:22px"><span class="logo-mark"><i class="fa-solid fa-paw"></i></span><span>Lancaster<small>Pet Movers</small></span></a>
+    <h1 style="font-size:24px">Staff sign in</h1>
+    <% if (error) { %><div class="alert alert-error" role="alert"><i class="fa-solid fa-circle-exclamation"></i> <%= error %></div><% } %>
+    <% flash.forEach((f) => { %><div class="alert alert-<%= f.type === 'error' ? 'error' : 'success' %>"><%= f.message %></div><% }) %>
+    <form method="post" action="/admin/login" class="form-grid">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" value="<%= email %>" autocomplete="username" required autofocus></div>
+      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>

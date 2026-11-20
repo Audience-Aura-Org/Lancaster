@@ -1,0 +1,27 @@
+<%- include('_top') %>
+<div class="admin-head"><div><h1>Customers</h1><div class="sub"><%= total %> found</div></div></div>
+<form class="filters" method="get" style="grid-template-columns:1fr auto">
+  <input type="search" name="q" value="<%= filter.q %>" placeholder="Search name, email, phone…" aria-label="Search">
+  <button class="btn btn-dark btn-sm" type="submit">Search</button>
+</form>
+<section class="panel table-wrap">
+  <% if (!rows.length) { %><div class="empty">No customers yet.</div><% } else { %>
+  <table class="table">
+    <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Quotes</th><th>Bookings</th><th>Since</th></tr></thead>
+    <tbody>
+    <% rows.forEach((c) => { %>
+      <tr>
+        <td data-label="Name"><a class="row-link" href="/admin/customers/<%= c.id %>"><%= c.name %></a></td>
+        <td data-label="Email"><%= c.email %></td>
+        <td data-label="Phone"><%= c.phone || '-' %></td>
+        <td data-label="Quotes"><%= c.quotes %></td>
+        <td data-label="Bookings"><%= c.bookings %></td>
+        <td data-label="Since"><%= c.created_at.slice(0, 10) %></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+</section>
+<%- include('_pager') %>
+<%- include('_bottom') %>

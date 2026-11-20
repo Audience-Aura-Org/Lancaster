@@ -1,0 +1,61 @@
+/* =================== Admin dashboard: calm and simple =================== */
+.dash-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px; margin: 6px 0 28px; }
+.dash-date { margin: 0 0 4px; font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+.dash-head h1 { margin: 0; font-size: 28px; font-weight: 600; color: var(--brand-2); }
+.dash-tools { display: flex; gap: 10px; align-items: center; flex: 1 1 360px; max-width: 560px; }
+.dash-search { position: relative; flex: 1; }
+.dash-search i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 14px; }
+.dash-search input { padding-left: 40px; min-height: 42px; border-radius: 999px; background: #fff; border-color: var(--line); font-size: 14px; }
+.dash-tools .btn { min-height: 42px; white-space: nowrap; }
+
+/* Four plain numbers */
+.dash-stats { display: grid; grid-template-columns: repeat(2, 1fr); background: #fff; border: 1px solid var(--line); border-radius: 16px; margin-bottom: 24px; overflow: hidden; }
+.dash-stats a { display: flex; flex-direction: column; gap: 2px; padding: 18px 22px; text-decoration: none; color: var(--muted); font-size: 13px; transition: background .15s; }
+.dash-stats a:hover, .dash-stats a:focus-visible { background: #f8fafa; color: var(--muted); }
+.dash-stats span { font-size: 30px; font-weight: 600; line-height: 1.15; color: var(--brand-2); font-variant-numeric: tabular-nums; }
+.dash-stats a:nth-child(odd) { border-right: 1px solid var(--line); }
+.dash-stats a:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+@media (min-width: 1000px) {
+  .dash-stats { grid-template-columns: repeat(4, 1fr); }
+  .dash-stats a { border: 0 !important; }
+  .dash-stats a + a { border-left: 1px solid var(--line) !important; }
+}
+
+/* Two quiet lists */
+.dash-grid { display: grid; gap: 24px; }
+@media (min-width: 1200px) { .dash-grid { grid-template-columns: 1fr 1fr; align-items: start; } }
+.dash-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px 24px; min-width: 0; }
+.dash-card h2 { display: flex; justify-content: space-between; align-items: baseline; font-size: 16px; font-weight: 600; margin: 0 0 8px; color: var(--brand-2); }
+.dash-card h2 a { font-size: 13px; font-weight: 500; text-decoration: none; }
+.dash-list { list-style: none; margin: 0; padding: 0; }
+.dash-list li + li { border-top: 1px solid var(--line); }
+.dash-list a { display: flex; align-items: center; gap: 14px; padding: 14px 4px; text-decoration: none; color: var(--ink); border-radius: 8px; }
+.dash-list a:hover, .dash-list a:focus-visible { background: #f8fafa; color: var(--ink); }
+.dash-list .fa-chevron-right { color: #b9c3c6; font-size: 12px; }
+.dash-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dash-text strong { font-weight: 500; font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-text small, .dash-meta small { color: var(--muted); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dash-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 13px; color: var(--brand-2); white-space: nowrap; }
+.dash-day { width: 46px; flex: 0 0 46px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); line-height: 1.2; }
+.dash-day b { display: block; font-size: 20px; letter-spacing: 0; color: var(--brand-2); font-weight: 600; }
+/* Urgency: small dot + the level written out in text (never colour alone) */
+.dot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 9px; }
+.dot-critical { background: #c0392b; }
+.dot-warning { background: #d4a23a; }
+.dot-info { background: #9fb9be; }
+.dash-calm { margin: 10px 0 4px; color: var(--muted); font-size: 14px; display: flex; gap: 10px; align-items: center; }
+.dash-calm i { color: var(--ok); }
+.dash-more { margin: 10px 4px 0; font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) {
+  .dash-card { padding: 18px 16px; }
+  .dash-meta small { display: none; }
+}
+
+/* Search results page (shares the compact list style) */
+.mini-list { list-style: none; margin: 0; padding: 0; }
+.mini-list li + li { border-top: 1px solid var(--line); }
+.mini-list a { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 4px; text-decoration: none; color: var(--ink); font-size: 14px; border-radius: 8px; }
+.mini-list a:hover { background: #f7fafa; color: var(--ink); }
+.mini-list .muted { font-size: 13px; }
+.dash-empty { display: flex; gap: 14px; align-items: center; padding: 10px 2px; }
+.dash-empty > i { font-size: 22px; color: var(--muted); }

@@ -1,0 +1,7 @@
+<%- include('_top') %>
+<div class="panel empty">
+  <h1 style="font-size:22px"><%= status === 404 ? 'Not found' : status === 403 ? 'Not allowed' : 'Something went wrong' %></h1>
+  <p><%= message %></p>
+  <a class="btn btn-dark btn-sm" href="/admin">Back to dashboard</a>
+</div>
+<%- include('_bottom') %>

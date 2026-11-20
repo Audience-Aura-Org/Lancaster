@@ -1,0 +1,15 @@
+<%# Step 1 for admin forms: pet or item. Params: chooseBase (e.g. "/admin/bookings/new"), chooseWhat ("booking" | "quote") %>
+<div class="kind-choose">
+  <a class="kind-card" href="<%= chooseBase %>?type=pet">
+    <span class="kind-icon"><i class="fa-solid <%= domain.SHIPMENT_KINDS.pet.icon %>"></i></span>
+    <strong>Pet <%= chooseWhat %></strong>
+    <span class="muted"><%= domain.SHIPMENT_KINDS.pet.blurb %></span>
+    <span class="kind-services"><%= Object.values(domain.PET_SERVICES).map((s) => s.label).join(' · ') %></span>
+  </a>
+  <a class="kind-card" href="<%= chooseBase %>?type=item">
+    <span class="kind-icon"><i class="fa-solid <%= domain.SHIPMENT_KINDS.freight.icon %>"></i></span>
+    <strong>Item <%= chooseWhat %></strong>
+    <span class="muted"><%= domain.SHIPMENT_KINDS.freight.blurb %></span>
+    <span class="kind-services"><%= Object.values(domain.FREIGHT_SERVICES).map((s) => s.short).join(' · ') %></span>
+  </a>
+</div>

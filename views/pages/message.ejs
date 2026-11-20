@@ -1,0 +1,16 @@
+<%- include('../partials/theme-top', { heading: locals.heading || title }) %>
+<main class="service-detail-page">
+  <div class="container">
+    <div class="lpm-message">
+      <div class="lpm-message-icon <%= (locals.status || 200) >= 400 ? 'is-error' : '' %>"><i class="fa-solid <%= (locals.status || 200) >= 400 ? 'fa-circle-exclamation' : 'fa-circle-check' %>"></i></div>
+      <h1><%= locals.heading || title %></h1>
+      <p><%= message %></p>
+      <% if (locals.badge) { %><p class="lpm-badge"><%= badge %></p><% } %>
+      <div class="lpm-actions">
+        <a class="btn-default" href="<%= locals.back || '/' %>"><%= locals.back && locals.back !== '/' ? 'Go back' : 'Back to Home' %></a>
+        <a class="btn-default btn-highlighted" href="/contact.html">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</main>
+<%- include('../partials/theme-bottom') %>

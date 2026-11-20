@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="robots" content="noindex, nofollow">
+  <title><%= title %> | Admin | <%= business.name %></title>
+  <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/site.css">
+  <link rel="stylesheet" href="/static/css/admin.css">
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/sidebar.css">
+  <link rel="stylesheet" href="/static/css/admin-kinds.css">
+<link href="/static/css/zoom.css" rel="stylesheet">
+</head>
+<body class="admin">
+<%
+  const badge = locals.navBadges || {};
+  const nav = [
+    ['/admin', 'fa-gauge', 'Dashboard'],
+    ['/admin/quotes', 'fa-file-signature', 'Quote requests', badge.quotes],
+    ['/admin/bookings', 'fa-suitcase-rolling', 'Bookings'],
+    ['/admin/customers', 'fa-users', 'Customers'],
+    ['/admin/messages', 'fa-inbox', 'Messages', badge.messages],
+    ['/admin/subscribers', 'fa-newspaper', 'Subscribers'],
+    ['/admin/emails', 'fa-envelope', 'Email log'],
+  ];
+  const ownerNav = [['/admin/users', 'fa-user-shield', 'Team accounts'], ['/admin/activity', 'fa-clock-rotate-left', 'Activity log']];
+  const p = path.replace(/\/+$/, '') || '/';
+  const isActive = (href) => href === '/admin' ? p === '/admin' : p.startsWith(href);
+%>
+<div class="admin-shell">
+  <div class="admin-topbar">
+    <a class="logo" href="/admin"><span class="logo-mark"><i class="fa-solid fa-paw"></i></span><span>Admin</span></a>
+    <button class="nav-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <a class="logo" href="/admin"><span class="logo-mark"><i class="fa-solid fa-paw"></i></span><span>Lancaster<small>Pet Movers admin</small></span></a>
+      <a class="site-link" href="/" target="_blank" rel="noopener" title="View website" aria-label="View website (opens in a new tab)"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+    </div>
+    <nav aria-label="Admin">
+      <% nav.forEach(([href, icon, text, count]) => { %>
+        <a href="<%= href %>" class="<%= isActive(href) ? 'active' : '' %>"><i class="fa-solid <%= icon %>"></i><%= text %><% if (count) { %><span class="count"><%= count %></span><% } %></a>
+      <% }) %>
+      <% if (admin.role === 'owner') { %>
+        <div class="nav-label">Owner</div>
+        <% ownerNav.forEach(([href, icon, text]) => { %>
+          <a href="<%= href %>" class="<%= isActive(href) ? 'active' : '' %>"><i class="fa-solid <%= icon %>"></i><%= text %></a>
+        <% }) %>
+      <% } %>
+    </nav>
+    <% const initials = admin.name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('') || '?'; %>
+    <div class="me">
+      <div class="me-id">
+        <span class="me-avatar" aria-hidden="true"><%= initials %></span>
+        <span class="me-text">
+          <strong><%= admin.name %></strong>
+          <span class="me-sub" title="<%= admin.email %>"><%= admin.role === 'owner' ? 'Owner' : 'Staff' %> · <%= admin.email %></span>
+        </span>
+      </div>
+      <div class="me-actions">
+        <a href="/admin/account"><i class="fa-solid fa-gear"></i> My account</a>
+        <form method="post" action="/admin/logout"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit"><i class="fa-solid fa-right-from-bracket"></i> Sign out</button></form>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-backdrop"></div>
+  <main class="admin-main" id="main">
+    <% flash.forEach((f) => { %>
+      <div class="alert alert-<%= f.type === 'error' ? 'error' : 'success' %>" role="<%= f.type === 'error' ? 'alert' : 'status' %>"><i class="fa-solid <%= f.type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check' %>"></i> <%= f.message %></div>
+    <% }) %>

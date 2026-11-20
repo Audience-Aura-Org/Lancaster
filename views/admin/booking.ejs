@@ -1,0 +1,164 @@
+<%- include('_top') %>
+<% const isAir = domain.isAir(booking.service_type); const freight = domain.isFreight(booking.service_type); %>
+<div class="admin-head">
+  <div>
+    <h1><%- include('_kind', { kindService: booking.service_type }) %> <%= domain.itemName(booking) %> &middot; <%= booking.ref %></h1>
+    <div class="sub"><%= domain.label(domain.SERVICE_TYPES, booking.service_type) %> &middot; <span class="status status-<%= booking.status %>"><%= domain.label(domain.BOOKING_STATUSES, booking.status) %></span></div>
+  </div>
+  <a class="btn btn-outline btn-sm" href="/admin/bookings"><i class="fa-solid fa-arrow-left"></i> Bookings</a>
+</div>
+
+<div class="admin-grid cols-2">
+  <div>
+    <section class="panel">
+      <h2><i class="fa-solid fa-envelope-circle-check"></i> Update status &amp; notify customer</h2>
+      <p class="muted" style="font-size:13px;margin-top:-6px">Each status sends a fixed email written for <strong><%= domain.SERVICE_TYPES[booking.service_type].short.toLowerCase() %></strong> trips. Customers can also see the status on the Track page.</p>
+      <form method="post" action="/admin/bookings/<%= booking.id %>/status" data-once>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-grid cols-2">
+          <select name="status" aria-label="New status">
+            <% Object.entries(domain.BOOKING_STATUSES).forEach(([k, s]) => { %><option value="<%= k %>" <%= booking.status === k ? 'selected' : '' %>><%= s.label %></option><% }) %>
+          </select>
+          <label class="check" style="align-self:center"><input type="checkbox" name="notify" checked> Email the customer</label>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary btn-sm" type="submit">Save status</button>
+        </div>
+      </form>
+      <form method="post" action="/admin/bookings/<%= booking.id %>/resend" class="form-actions" data-once data-confirm="Re-send the current status email to <%= booking.customer_email %>?">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-outline btn-sm" type="submit"><i class="fa-solid fa-rotate-right"></i> Re-send current status email</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2><i class="fa-solid fa-route"></i> Transport details</h2>
+      <form method="post" action="/admin/bookings/<%= booking.id %>/details">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-grid cols-2">
+          <% if (freight) { %>
+          <div class="field span-2"><label>What is being shipped?</label><input type="text" name="cargo_description" value="<%= booking.cargo_description || '' %>" required></div>
+          <div class="field"><label>Packaging</label>
+            <select name="package_type"><option value="">Select…</option><% Object.entries(domain.PACKAGE_TYPES).forEach(([k, l]) => { %><option value="<%= k %>" <%= booking.package_type === k ? 'selected' : '' %>><%= l %></option><% }) %></select></div>
+          <div class="field"><label>Dimensions</label><input type="text" name="dimensions" value="<%= booking.dimensions || '' %>" placeholder="e.g. 4 pallets, 120x100x150 cm"></div>
+          <div class="field"><label>Declared value (USD)</label><input type="number" name="declared_value" step="0.01" min="0" value="<%= booking.declared_value != null ? booking.declared_value : '' %>"></div>
+          <% } else { %>
+          <div class="field"><label>Type of pet</label>
+            <select name="pet_type"><% Object.entries(domain.PET_TYPES).forEach(([k, l]) => { %><option value="<%= k %>" <%= booking.pet_type === k ? 'selected' : '' %>><%= l %></option><% }) %></select></div>
+          <div class="field"><label>Pet's name</label><input type="text" name="pet_name" value="<%= booking.pet_name || '' %>"></div>
+          <div class="field"><label>Breed</label><input type="text" name="breed" value="<%= booking.breed || '' %>"></div>
+          <div class="field"><label>Age</label><input type="text" name="pet_age" value="<%= booking.pet_age || '' %>" placeholder="e.g. 3 years"></div>
+          <% } %>
+          <div class="field span-2"><label><%= freight ? 'Handling instructions' : 'Health, medication or temperament notes' %></label><textarea name="special_needs" maxlength="1000" style="min-height:70px"><%= booking.special_needs || '' %></textarea></div>
+          <div class="field"><label>Weight (lbs)</label><input type="number" name="weight_lbs" step="0.1" min="0" value="<%= booking.weight_lbs != null ? booking.weight_lbs : '' %>"></div>
+          <div class="field"><label><%= freight ? "Pieces / packages" : "Number of pets" %></label><input type="number" name="pet_count" min="1" max="9999" value="<%= booking.pet_count %>"></div>
+          <div class="field"><label><%= freight ? "Ship date" : "Travel date" %></label><input type="date" name="travel_date" value="<%= booking.travel_date || '' %>"></div>
+          <div class="field"><label>From</label><input type="text" name="origin" value="<%= booking.origin %>" required></div>
+          <div class="field"><label>To</label><input type="text" name="destination" value="<%= booking.destination %>" required></div>
+          <div class="field"><label>Agreed price (USD)</label><input type="number" name="total_amount" step="0.01" min="0" value="<%= booking.total_amount != null ? booking.total_amount : '' %>"></div>
+          <% if (isAir) { %>
+            <div class="field"><label>Airline air waybill (AWB)</label><input type="text" name="airline_awb" value="<%= booking.airline_awb || '' %>" placeholder="e.g. 006-12345675" inputmode="numeric">
+              <div class="hint">From the airline's booking. Validated with the AWB check digit.<% if (awbResult && awbResult.valid && awbResult.airline) { %> Airline: <strong><%= awbResult.airline.name %></strong><% } %></div></div>
+            <div class="field span-2"><label>Flight details</label><input type="text" name="flight_details" value="<%= booking.flight_details || '' %>" placeholder="e.g. DL 1234 PHL→LAX, departs 08:15, arrives 11:05"></div>
+          <% } else { %>
+            <div class="field"><label>Pickup window</label><input type="text" name="pickup_window" value="<%= booking.pickup_window || '' %>" placeholder="e.g. Mon 12 May, 8–11am"></div>
+            <div class="field"><label>Transport details</label><input type="text" name="flight_details" value="<%= booking.flight_details || '' %>" placeholder="<%= booking.service_type === 'ocean_freight' ? 'e.g. Vessel, voyage, container number' : 'e.g. Carrier and route reference' %>"></div>
+          <% } %>
+        </div>
+        <div class="form-actions"><button class="btn btn-dark btn-sm" type="submit">Save details</button></div>
+      </form>
+    </section>
+
+    <section class="panel" id="documents">
+      <h2><i class="fa-solid fa-file-medical"></i> Document checklist</h2>
+      <p class="muted" style="font-size:13px;margin-top:-6px">Tick documents as they arrive. Customers see this list on the Track page and in reminder emails.</p>
+      <% const standardKeys = (domain.DOCUMENTS[booking.service_type] || []).map(([k]) => k); const missingStandard = standardKeys.filter((k) => !documents.some((d) => d.doc_key === k)).length; %>
+      <form method="post" action="/admin/bookings/<%= booking.id %>/documents">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="checklist" value="1">
+        <% if (!documents.length) { %><div class="empty" style="padding:16px">No documents needed for this shipment. Add one below.</div><% } %>
+        <% documents.forEach((d) => { %>
+          <div class="doc-row">
+            <label class="doc-check"><input type="checkbox" name="received" value="<%= d.id %>" <%= d.received ? 'checked' : '' %>><span><%= d.label %><% if (d.doc_key.startsWith('custom_')) { %> <em class="muted" style="font-size:12px">(added)</em><% } %><% if (d.received_at) { %><small>Received <%= d.received_at %> UTC</small><% } %></span></label>
+            <button class="doc-remove" type="submit" formaction="/admin/bookings/<%= booking.id %>/documents/<%= d.id %>/delete" data-confirm="Remove &quot;<%= d.label %>&quot; from the checklist?" title="Remove this document" aria-label="Remove <%= d.label %>"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        <% }) %>
+        <% if (documents.length) { %><div class="form-actions"><button class="btn btn-dark btn-sm" type="submit">Save ticks</button></div><% } %>
+      </form>
+
+      <form method="post" action="/admin/bookings/<%= booking.id %>/documents/add" class="doc-add">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="doc-add-title">Add needed documents</div>
+        <details class="doc-choose">
+          <summary><i class="fa-solid fa-list-check"></i> Choose from the list</summary>
+          <%- include('_doc-picker', { pickService: booking.service_type, pickName: 'pick', pickPreselect: false, pickExclude: documents, pickCustom: '' }) %>
+        </details>
+        <label for="doc-label" class="sr-only">Or type a document name</label>
+        <div class="doc-add-row">
+          <input id="doc-label" type="text" name="label" maxlength="200" placeholder="…or type your own, e.g. Letter from destination employer">
+          <button class="btn btn-primary btn-sm" type="submit"><i class="fa-solid fa-plus"></i> Add</button>
+        </div>
+      </form>
+
+      <div class="form-actions">
+        <form method="post" action="/admin/bookings/<%= booking.id %>/remind" class="inline-form" data-once data-confirm="Email a reminder about outstanding documents?">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn-outline btn-sm" type="submit" <%= documents.every((d) => d.received) ? 'disabled' : '' %>><i class="fa-solid fa-bell"></i> Email documents reminder</button>
+        </form>
+        <% if (missingStandard) { %>
+        <form method="post" action="/admin/bookings/<%= booking.id %>/documents/restore" class="inline-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn-outline btn-sm" type="submit"><i class="fa-solid fa-rotate-left"></i> Restore <%= missingStandard %> standard document<%= missingStandard > 1 ? 's' : '' %></button>
+        </form>
+        <% } %>
+      </div>
+    </section>
+  </div>
+
+  <div>
+    <section class="panel">
+      <h2><i class="fa-solid fa-user"></i> Customer</h2>
+      <dl class="kv">
+        <dt>Name</dt><dd><a href="/admin/customers/<%= booking.customer_id %>"><%= booking.customer_name %></a></dd>
+        <dt>Email</dt><dd><a href="mailto:<%= booking.customer_email %>"><%= booking.customer_email %></a></dd>
+        <dt>Phone</dt><dd><%= booking.customer_phone || '-' %></dd>
+        <% if (booking.quote_id) { %><dt>From quote</dt><dd><a href="/admin/quotes/<%= booking.quote_id %>">View quote</a></dd><% } %>
+        <dt>Created</dt><dd><%= booking.created_at %> UTC</dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2><i class="fa-solid fa-clock-rotate-left"></i> Status history</h2>
+      <ul class="timeline-mini">
+        <% events.slice().reverse().forEach((e) => { %>
+          <li><strong><%= domain.label(domain.BOOKING_STATUSES, e.status) %></strong><small><%= e.created_at %> UTC &middot; <%= e.admin_name || 'System' %><%= e.email_sent ? ' · emailed' : '' %></small></li>
+        <% }) %>
+      </ul>
+    </section>
+
+    <section class="panel table-wrap">
+      <h2><i class="fa-solid fa-envelope"></i> Emails sent</h2>
+      <% if (!emails.length) { %><div class="empty">No emails yet.</div><% } else { %>
+      <table class="table">
+        <tbody>
+        <% emails.forEach((m) => { %>
+          <tr><td data-label=""><%= m.subject %><br><small class="muted"><%= m.created_at %> UTC</small></td><td data-label="Status"><span class="status status-<%= m.status %>"><%= m.status.replace(/_/g, ' ') %></span></td></tr>
+        <% }) %>
+        </tbody>
+      </table>
+      <% } %>
+    </section>
+
+    <%- include('_notes', { noteEntity: 'booking', noteEntityId: booking.id }) %>
+
+    <section class="panel danger-zone">
+      <h2><i class="fa-solid fa-triangle-exclamation"></i> Danger zone</h2>
+      <p class="muted" style="font-size:13px">Permanently deletes this shipment, its document checklist, status history and notes. Its tracking number (<strong><%= booking.ref %></strong>) will stop working. No email is sent to the customer. This cannot be undone.</p>
+      <form method="post" action="/admin/bookings/<%= booking.id %>/delete" data-confirm="Permanently delete shipment <%= booking.ref %> for <%= booking.customer_name %>? This cannot be undone.">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-danger btn-sm" type="submit"><i class="fa-solid fa-trash"></i> Delete shipment</button>
+      </form>
+    </section>
+  </div>
+</div>
+<%- include('_bottom') %>

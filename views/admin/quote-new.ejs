@@ -1,0 +1,34 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <div>
+    <h1><%= kind ? (kind === 'pet' ? 'New pet quote' : 'New item quote') : 'New quote request' %></h1>
+    <div class="sub">For enquiries that came in by phone, email or in person. You can send the price from the quote page afterwards.</div>
+  </div>
+  <a class="btn btn-outline btn-sm" href="<%= kind ? '/admin/quotes/new' : '/admin/quotes' %>"><i class="fa-solid fa-arrow-left"></i> <%= kind ? 'Change type' : 'Quote requests' %></a>
+</div>
+
+<% if (!kind) { %>
+  <%- include('_choose-kind', { chooseBase: '/admin/quotes/new', chooseWhat: 'quote' }) %>
+<% } else { %>
+<form class="panel" method="post" action="/admin/quotes/new" data-once>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <% if (Object.keys(errors).length) { %><div class="alert alert-error"><i class="fa-solid fa-circle-exclamation"></i> Please fix the highlighted fields.</div><% } %>
+  <div class="kind-pill kind-<%= kind %>"><i class="fa-solid <%= domain.SHIPMENT_KINDS[kind].icon %>"></i> <%= domain.SHIPMENT_KINDS[kind].label %></div>
+
+  <h2><i class="fa-solid fa-user"></i> Customer</h2>
+  <div class="form-grid cols-2">
+    <%- include('../partials/field', { name: 'name', label: 'Full name', required: true }) %>
+    <%- include('../partials/field', { name: 'email', label: 'Email', type: 'email', required: true, hint: 'Existing customers are matched by email.' }) %>
+    <%- include('../partials/field', { name: 'phone', label: 'Phone', type: 'tel' }) %>
+  </div>
+
+  <%- include('_shipment-fields', { kind, values, errors }) %>
+
+  <div class="form-grid" style="margin-top:16px">
+    <%- include('../partials/field', { name: 'message', label: 'Notes from the customer', type: 'textarea', attrs: 'maxlength="2000" style="min-height:80px"' }) %>
+  </div>
+  <label class="check" style="margin-top:18px"><input type="checkbox" name="notify" checked> Email the customer a "we received your request" confirmation</label>
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Create <%= kind === 'pet' ? 'pet quote' : 'item quote' %></button></div>
+</form>
+<% } %>
+<%- include('_bottom') %>

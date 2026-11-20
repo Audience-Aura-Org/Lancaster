@@ -1,0 +1,55 @@
+<%#
+  Admin shipment fields for one kind ('pet' | 'freight'). Params: kind, values, errors.
+  Used by "New booking" and "New quote".
+%>
+<% const isPet = kind === 'pet';
+   const services = Object.entries(domain.SERVICE_TYPES).filter(([, s]) => s.category === kind);
+   const fe = (k) => errors[k] ? `<div class="error">${errors[k]}</div>` : ''; %>
+<input type="hidden" name="kind" value="<%= isPet ? 'pet' : 'item' %>">
+
+<h2 style="margin-top:24px"><i class="fa-solid <%= domain.SHIPMENT_KINDS[kind].icon %>"></i> <%= isPet ? 'Pet & trip' : 'Item & shipment' %></h2>
+<div class="form-grid cols-2">
+  <div class="field <%= errors.service_type ? 'has-error' : '' %>">
+    <label for="f-service_type">Service <span class="req">*</span></label>
+    <select id="f-service_type" name="service_type" required>
+      <option value="">Select…</option>
+      <% services.forEach(([k, s]) => { %><option value="<%= k %>" <%= values.service_type === k ? 'selected' : '' %>><%= s.label %></option><% }) %>
+    </select>
+    <%- fe('service_type') %>
+  </div>
+
+  <% if (isPet) { %>
+    <div class="field <%= errors.pet_type ? 'has-error' : '' %>">
+      <label for="f-pet_type">Type of pet <span class="req">*</span></label>
+      <select id="f-pet_type" name="pet_type" required>
+        <option value="">Select…</option>
+        <% Object.entries(domain.PET_TYPES).forEach(([k, l]) => { %><option value="<%= k %>" <%= values.pet_type === k ? 'selected' : '' %>><%= l %></option><% }) %>
+      </select>
+      <%- fe('pet_type') %>
+    </div>
+    <%- include('../partials/field', { name: 'pet_name', label: "Pet's name" }) %>
+    <%- include('../partials/field', { name: 'breed', label: 'Breed' }) %>
+    <%- include('../partials/field', { name: 'pet_age', label: 'Age', hint: 'e.g. 3 years' }) %>
+    <%- include('../partials/field', { name: 'weight_lbs', label: 'Weight (lbs)', type: 'number', attrs: 'min="0" step="0.1"' }) %>
+    <%- include('../partials/field', { name: 'pet_count', label: 'Number of pets', type: 'number', attrs: 'min="1" max="50"' }) %>
+    <%- include('../partials/field', { name: 'special_needs', label: 'Health, medication or temperament notes', type: 'textarea', cls: 'span-2', attrs: 'maxlength="1000" style="min-height:80px"' }) %>
+  <% } else { %>
+    <%- include('../partials/field', { name: 'cargo_description', label: 'What is being shipped?', required: true, hint: 'e.g. 4 pallets of machine parts' }) %>
+    <div class="field">
+      <label for="f-package_type">Packaging</label>
+      <select id="f-package_type" name="package_type">
+        <option value="">Select…</option>
+        <% Object.entries(domain.PACKAGE_TYPES).forEach(([k, l]) => { %><option value="<%= k %>" <%= values.package_type === k ? 'selected' : '' %>><%= l %></option><% }) %>
+      </select>
+    </div>
+    <%- include('../partials/field', { name: 'pet_count', label: 'Number of pieces', type: 'number', attrs: 'min="1" max="9999"' }) %>
+    <%- include('../partials/field', { name: 'weight_lbs', label: 'Total weight (lbs)', type: 'number', attrs: 'min="0" step="0.1"' }) %>
+    <%- include('../partials/field', { name: 'dimensions', label: 'Dimensions', hint: 'e.g. 120 x 100 x 150 cm each' }) %>
+    <%- include('../partials/field', { name: 'declared_value', label: 'Declared value (USD)', type: 'number', attrs: 'min="0" step="0.01"' }) %>
+    <%- include('../partials/field', { name: 'special_needs', label: 'Handling instructions', type: 'textarea', cls: 'span-2', attrs: 'maxlength="1000" style="min-height:80px" placeholder="e.g. Fragile, keep upright, liftgate at delivery"' }) %>
+  <% } %>
+
+  <%- include('../partials/field', { name: 'origin', label: isPet ? 'Travelling from' : 'Collect from', required: true }) %>
+  <%- include('../partials/field', { name: 'destination', label: isPet ? 'Travelling to' : 'Deliver to', required: true }) %>
+  <%- include('../partials/field', { name: 'travel_date', label: isPet ? 'Travel date' : 'Ship date', type: 'date' }) %>
+</div>

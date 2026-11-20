@@ -1,0 +1,53 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <div><h1>Bookings</h1><div class="sub"><%= total %> found</div></div>
+  <a class="btn btn-primary btn-sm" href="/admin/bookings/new"><i class="fa-solid fa-plus"></i> New booking</a>
+</div>
+
+<form class="filters" method="get">
+  <input type="search" name="q" value="<%= filter.q %>" placeholder="Search name, email, reference, pet, item…" aria-label="Search">
+  <select name="status" data-autosubmit aria-label="Status">
+    <option value="">All statuses</option>
+    <% Object.entries(domain.BOOKING_STATUSES).forEach(([k, s]) => { %><option value="<%= k %>" <%= filter.status === k ? 'selected' : '' %>><%= s.label %></option><% }) %>
+  </select>
+  <select name="type" data-autosubmit aria-label="Pet or item">
+    <option value="">Pets &amp; items</option>
+    <option value="pet" <%= filter.type === 'pet' ? 'selected' : '' %>>Pets only</option>
+    <option value="item" <%= filter.type === 'item' ? 'selected' : '' %>>Items only</option>
+  </select>
+  <select name="service" data-autosubmit aria-label="Service">
+    <option value="">All services</option>
+    <% Object.entries(domain.SERVICE_TYPES).forEach(([k, s]) => { %><option value="<%= k %>" <%= filter.service === k ? 'selected' : '' %>><%= s.short %></option><% }) %>
+  </select>
+  <button class="btn btn-dark btn-sm" type="submit">Filter</button>
+</form>
+
+<section class="panel table-wrap">
+  <% if (!rows.length) { %><div class="empty">No bookings match.</div><% } else { %>
+  <table class="table">
+    <thead><tr><th>Type</th><th>Booking</th><th>Customer</th><th>Pet / item</th><th>Service</th><th>Route</th><th>Travel date</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+    <tbody>
+    <% rows.forEach((b) => { %>
+      <tr>
+        <td data-label="Type"><%- include('_kind', { kindService: b.service_type, kindSmall: true }) %></td>
+        <td data-label="Booking"><a class="row-link" href="/admin/bookings/<%= b.id %>"><%= b.ref %></a></td>
+        <td data-label="Customer"><%= b.customer_name %></td>
+        <td data-label="Pet / item"><%= domain.itemName(b) %></td>
+        <td data-label="Service"><%= domain.SERVICE_TYPES[b.service_type].short %></td>
+        <td data-label="Route"><%= b.origin %> &rarr; <%= b.destination %></td>
+        <td data-label="Travel date"><%= b.travel_date || 'TBC' %></td>
+        <td data-label="Status"><span class="status status-<%= b.status %>"><%= domain.label(domain.BOOKING_STATUSES, b.status) %></span></td>
+        <td data-label="">
+          <form method="post" action="/admin/bookings/<%= b.id %>/delete" class="inline-form" data-confirm="Permanently delete shipment <%= b.ref %> for <%= b.customer_name %>? This cannot be undone.">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button class="btn btn-danger btn-sm" type="submit" title="Delete shipment <%= b.ref %>" aria-label="Delete shipment <%= b.ref %>"><i class="fa-solid fa-trash"></i><span class="del-label"> Delete</span></button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table>
+  <% } %>
+</section>
+<%- include('_pager') %>
+<%- include('_bottom') %>

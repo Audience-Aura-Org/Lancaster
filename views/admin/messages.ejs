@@ -1,0 +1,28 @@
+<%- include('_top') %>
+<div class="admin-head"><div><h1>Messages</h1><div class="sub">From the website contact form</div></div></div>
+<form class="filters" method="get" style="grid-template-columns:220px">
+  <select name="status" data-autosubmit aria-label="Status">
+    <option value="">Inbox (new + read)</option>
+    <option value="new" <%= filter.status === 'new' ? 'selected' : '' %>>New</option>
+    <option value="read" <%= filter.status === 'read' ? 'selected' : '' %>>Read</option>
+    <option value="archived" <%= filter.status === 'archived' ? 'selected' : '' %>>Archived</option>
+  </select>
+</form>
+<% if (!rows.length) { %><div class="panel empty">No messages.</div><% } %>
+<% rows.forEach((m) => { %>
+  <article class="panel">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px">
+      <div><strong><%= m.subject || 'General enquiry' %></strong> <span class="status status-<%= m.status %>"><%= m.status %></span><br>
+        <small class="muted"><%= m.name %> &middot; <a href="mailto:<%= m.email %>"><%= m.email %></a><%= m.phone ? ' · ' + m.phone : '' %> &middot; <%= m.created_at %> UTC</small></div>
+      <div class="btn-row">
+        <% [['read', 'Mark read'], ['archived', 'Archive'], ['new', 'Mark new']].filter(([s]) => s !== m.status).forEach(([s, l]) => { %>
+          <form method="post" action="/admin/messages/<%= m.id %>" class="inline-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="hidden" name="status" value="<%= s %>"><button class="btn btn-outline btn-sm" type="submit"><%= l %></button></form>
+        <% }) %>
+        <a class="btn btn-dark btn-sm" href="mailto:<%= m.email %>?subject=<%= encodeURIComponent('Re: ' + (m.subject || 'Your message')) %>">Reply</a>
+      </div>
+    </div>
+    <p style="white-space:pre-line;margin:12px 0 0"><%= m.message %></p>
+  </article>
+<% }) %>
+<%- include('_pager') %>
+<%- include('_bottom') %>

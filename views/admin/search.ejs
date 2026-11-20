@@ -1,0 +1,52 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <div><h1>Search results</h1><div class="sub">for “<%= q %>” · <%= bookings.length + quotes.length + customers.length %> found</div></div>
+  <form class="dash-search" method="get" action="/admin/search" role="search" style="max-width:420px">
+    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+    <input type="search" name="q" value="<%= q %>" aria-label="Search" autofocus>
+  </form>
+</div>
+
+<% if (!bookings.length && !quotes.length && !customers.length) { %>
+  <div class="panel dash-empty"><i class="fa-solid fa-magnifying-glass"></i><div><strong>Nothing found.</strong><br><span class="muted">Try a tracking number, a customer's name or email, a pet's name, a cargo description or a city.</span></div></div>
+<% } %>
+
+<% if (bookings.length) { %>
+<section class="panel">
+  <h2><i class="fa-solid fa-suitcase-rolling"></i> Bookings (<%= bookings.length %>)</h2>
+  <ul class="mini-list">
+    <% bookings.forEach((b) => { %>
+      <li><a href="/admin/bookings/<%= b.id %>">
+        <span><strong><%= b.ref %></strong> · <%= domain.itemName(b) %><br><span class="muted"><%= b.customer_name %> · <%= b.origin %> → <%= b.destination %></span></span>
+        <span class="status status-<%= b.status %>"><%= domain.label(domain.BOOKING_STATUSES, b.status) %></span>
+      </a></li>
+    <% }) %>
+  </ul>
+</section>
+<% } %>
+
+<% if (quotes.length) { %>
+<section class="panel">
+  <h2><i class="fa-solid fa-file-signature"></i> Quote requests (<%= quotes.length %>)</h2>
+  <ul class="mini-list">
+    <% quotes.forEach((x) => { %>
+      <li><a href="/admin/quotes/<%= x.id %>">
+        <span><strong><%= x.ref %></strong> · <%= x.customer_name %><br><span class="muted"><%= domain.label(domain.SERVICE_TYPES, x.service_type) %> · <%= x.origin %> → <%= x.destination %></span></span>
+        <span class="status status-<%= x.status %>"><%= domain.label(domain.QUOTE_STATUSES, x.status) %></span>
+      </a></li>
+    <% }) %>
+  </ul>
+</section>
+<% } %>
+
+<% if (customers.length) { %>
+<section class="panel">
+  <h2><i class="fa-solid fa-users"></i> Customers (<%= customers.length %>)</h2>
+  <ul class="mini-list">
+    <% customers.forEach((c) => { %>
+      <li><a href="/admin/customers/<%= c.id %>"><span><strong><%= c.name %></strong><br><span class="muted"><%= c.email %><%= c.phone ? ' · ' + c.phone : '' %></span></span><i class="fa-solid fa-chevron-right muted"></i></a></li>
+    <% }) %>
+  </ul>
+</section>
+<% } %>
+<%- include('_bottom') %>

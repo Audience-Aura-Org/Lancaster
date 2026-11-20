@@ -1,0 +1,43 @@
+<%#
+  Pager for admin lists. Needs: total, page, pages, filter. Optional: from, to, per, perOptions.
+  Keeps the list's filters in every link.
+%>
+<% if (total > 0) {
+  const _per = locals.per || 10;
+  const _from = locals.from != null ? from : (page - 1) * _per + 1;
+  const _to = locals.to != null ? to : Math.min(total, page * _per);
+  const _opts = locals.perOptions || [10, 25, 50, 100];
+  const qs = (n, extra = {}) => {
+    const u = new URLSearchParams();
+    Object.entries(filter || {}).forEach(([k, val]) => { if (val) u.set(k, val); });
+    Object.entries(extra).forEach(([k, val]) => u.set(k, val));
+    if (n > 1) u.set('page', n);
+    const s = u.toString();
+    return s ? '?' + s : '?';
+  };
+  // Page numbers: first, last, current ±1, with gaps
+  const nums = [...new Set([1, page - 1, page, page + 1, pages])].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+%>
+<nav class="pager-bar" aria-label="Pages">
+  <div class="pager-info">Showing <strong><%= _from %>–<%= _to %></strong> of <strong><%= total %></strong></div>
+
+  <div class="pager-pages">
+    <% if (page > 1) { %><a class="pager-btn" href="<%= qs(page - 1) %>" rel="prev"><i class="fa-solid fa-chevron-left"></i> Previous</a><% } else { %><span class="pager-btn is-disabled" aria-disabled="true"><i class="fa-solid fa-chevron-left"></i> Previous</span><% } %>
+    <% let last = 0; nums.forEach((n) => { %>
+      <% if (n - last > 1) { %><span class="pager-gap">…</span><% } last = n; %>
+      <% if (n === page) { %><span class="pager-num is-current" aria-current="page"><%= n %></span><% } else { %><a class="pager-num" href="<%= qs(n) %>"><%= n %></a><% } %>
+    <% }) %>
+    <% if (page < pages) { %><a class="pager-btn" href="<%= qs(page + 1) %>" rel="next">Next <i class="fa-solid fa-chevron-right"></i></a><% } else { %><span class="pager-btn is-disabled" aria-disabled="true">Next <i class="fa-solid fa-chevron-right"></i></span><% } %>
+  </div>
+
+  <form class="pager-per" method="get">
+    <% Object.entries(filter || {}).forEach(([k, val]) => { if (val) { %><input type="hidden" name="<%= k %>" value="<%= val %>"><% } }) %>
+    <label for="per-page">Show</label>
+    <select id="per-page" name="per" data-autosubmit>
+      <% _opts.forEach((o) => { %><option value="<%= o %>" <%= o === _per ? 'selected' : '' %>><%= o %></option><% }) %>
+    </select>
+    <span>per page</span>
+    <noscript><button class="btn btn-outline btn-sm" type="submit">Apply</button></noscript>
+  </form>
+</nav>
+<% } %>

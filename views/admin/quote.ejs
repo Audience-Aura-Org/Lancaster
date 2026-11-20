@@ -1,0 +1,98 @@
+<%- include('_top') %>
+<div class="admin-head">
+  <div>
+    <h1><%- include('_kind', { kindService: quote.service_type }) %> <%= quote.customer_name %></h1>
+    <div class="sub"><%= quote.ref %> &middot; received <%= quote.created_at %> UTC &middot; <span class="status status-<%= quote.status %>"><%= domain.label(domain.QUOTE_STATUSES, quote.status) %></span></div>
+  </div>
+  <a class="btn btn-outline btn-sm" href="/admin/quotes"><i class="fa-solid fa-arrow-left"></i> All quotes</a>
+</div>
+
+<div class="admin-grid cols-2">
+  <div>
+    <section class="panel">
+      <h2><i class="fa-solid <%= domain.SHIPMENT_KINDS[domain.kindOf(quote.service_type) || "pet"].icon %>"></i> <%= domain.isFreight(quote.service_type) ? "Item details" : "Pet details" %></h2>
+      <dl class="kv">
+        <dt>Service</dt><dd><%= domain.label(domain.SERVICE_TYPES, quote.service_type) %></dd>
+        <% if (domain.isFreight(quote.service_type)) { %>
+        <dt>Item</dt><dd><%= quote.cargo_description || '-' %></dd>
+        <dt>Packaging</dt><dd><%= quote.package_type ? domain.PACKAGE_TYPES[quote.package_type] : '-' %></dd>
+        <dt>Pieces</dt><dd><%= quote.pet_count %></dd>
+        <dt>Dimensions</dt><dd><%= quote.dimensions || '-' %></dd>
+        <dt>Declared value</dt><dd><%= quote.declared_value != null ? money(quote.declared_value) : '-' %></dd>
+        <dt>Handling</dt><dd style="white-space:pre-line;font-weight:400"><%= quote.special_needs || '-' %></dd>
+        <% } else { %>
+        <dt>Pet</dt><dd><%= domain.label(domain.ITEM_LABELS, quote.pet_type) %><%= quote.pet_name ? ' - ' + quote.pet_name : '' %></dd>
+        <dt>Breed</dt><dd><%= quote.breed || '-' %></dd>
+        <dt>Age</dt><dd><%= quote.pet_age || '-' %></dd>
+        <dt>Number of pets</dt><dd><%= quote.pet_count %></dd>
+        <dt>Health / temperament</dt><dd style="white-space:pre-line;font-weight:400"><%= quote.special_needs || '-' %></dd>
+        <% } %>
+        <dt>Weight</dt><dd><%= quote.weight_lbs != null ? quote.weight_lbs + ' lbs' : '-' %></dd>
+        <dt>From</dt><dd><%= quote.origin %></dd>
+        <dt>To</dt><dd><%= quote.destination %></dd>
+        <dt>Travel date</dt><dd><%= quote.travel_date || 'Flexible' %></dd>
+        <dt>Message</dt><dd style="white-space:pre-line;font-weight:400"><%= quote.message || '-' %></dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2><i class="fa-solid fa-file-invoice-dollar"></i> Send quote</h2>
+      <% if (quote.quoted_amount != null) { %><p class="muted">Last quoted: <strong><%= money(quote.quoted_amount) %></strong></p><% } %>
+      <form method="post" action="/admin/quotes/<%= quote.id %>/send-quote" data-once data-confirm="Email this quote to <%= quote.customer_email %>?">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="form-grid cols-2">
+          <div class="field"><label for="amount">Price (USD)</label><input id="amount" name="amount" type="number" step="0.01" min="0" value="<%= quote.quoted_amount != null ? quote.quoted_amount : '' %>" required></div>
+          <div class="field span-2"><label for="qnotes">What's included / notes for the customer</label><textarea id="qnotes" name="notes" maxlength="3000" placeholder="e.g. Includes IATA crate, airport transfers and airline fees. Valid for 14 days."><%= quote.quote_notes || '' %></textarea></div>
+        </div>
+        <div class="form-actions"><button class="btn btn-primary btn-sm" type="submit"><i class="fa-solid fa-paper-plane"></i> Email quote to customer</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div>
+    <section class="panel">
+      <h2><i class="fa-solid fa-user"></i> Customer</h2>
+      <dl class="kv">
+        <dt>Name</dt><dd><a href="/admin/customers/<%= quote.customer_id %>"><%= quote.customer_name %></a></dd>
+        <dt>Email</dt><dd><a href="mailto:<%= quote.customer_email %>"><%= quote.customer_email %></a></dd>
+        <dt>Phone</dt><dd><% if (quote.customer_phone) { %><a href="tel:<%= quote.customer_phone %>"><%= quote.customer_phone %></a><% } else { %>-<% } %></dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2><i class="fa-solid fa-list-check"></i> Status</h2>
+      <% if (booking) { %>
+        <p>Converted to booking <a href="/admin/bookings/<%= booking.id %>"><strong><%= booking.ref %></strong></a>.</p>
+      <% } else { %>
+        <form method="post" action="/admin/quotes/<%= quote.id %>/status" class="form-grid">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <select name="status" aria-label="Quote status">
+            <% Object.entries(domain.QUOTE_STATUSES).filter(([k]) => k !== 'converted').forEach(([k, l]) => { %><option value="<%= k %>" <%= quote.status === k ? 'selected' : '' %>><%= l %></option><% }) %>
+          </select>
+          <button class="btn btn-dark btn-sm" type="submit">Update status</button>
+        </form>
+        <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+        <form method="post" action="/admin/quotes/<%= quote.id %>/convert" data-once data-confirm="Create a booking from this quote?">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="docs_present" value="1">
+          <div class="doc-add-title">Documents the customer will need</div>
+          <%- include('_doc-picker', { pickService: quote.service_type, pickName: 'docs_' + quote.service_type, pickPreselect: true, pickExclude: [], pickCustom: 'docs_custom' }) %>
+          <label class="check" style="margin:14px 0 12px"><input type="checkbox" name="notify" checked> Email booking confirmation and document checklist</label>
+          <button class="btn btn-primary btn-sm btn-block" type="submit"><i class="fa-solid fa-suitcase-rolling"></i> Convert to booking</button>
+        </form>
+      <% } %>
+    </section>
+
+    <%- include('_notes', { noteEntity: 'quote', noteEntityId: quote.id }) %>
+
+    <section class="panel danger-zone">
+      <h2><i class="fa-solid fa-triangle-exclamation"></i> Danger zone</h2>
+      <p class="muted" style="font-size:13px">Permanently deletes this quote request and its notes. No email is sent to the customer.<% if (booking) { %> Booking <strong><%= booking.ref %></strong> made from it will be kept.<% } %> This cannot be undone.</p>
+      <form method="post" action="/admin/quotes/<%= quote.id %>/delete" data-confirm="Permanently delete quote request <%= quote.ref %> from <%= quote.customer_name %>?<%= booking ? ' Booking ' + booking.ref + ' will be kept.' : '' %> This cannot be undone.">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-danger btn-sm" type="submit"><i class="fa-solid fa-trash"></i> Delete quote request</button>
+      </form>
+    </section>
+  </div>
+</div>
+<%- include('_bottom') %>

@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description" content="Explore freight, express delivery, customs support, project cargo, and pet transport options for your next journey.">
+    <meta name="keywords" content="">
+    <meta name="author" content="<%= business.name %>">
+    <!-- Page Title -->
+    <title>Our Shipping Services | <%= business.name %></title>
+    <!-- Favicon Icon -->
+    <link rel="shortcut icon" type="image/x-icon" href="/images/img/favicon.png">
+    <!-- Google Fonts Css-->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+    <!-- Bootstrap Css -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <!-- SlickNav Css -->
+    <link href="/css/slicknav.min.css" rel="stylesheet">
+    <!-- Swiper Css -->
+    <link rel="stylesheet" href="/css/swiper-bundle.min.css">
+    <!-- Font Awesome Icon Css-->
+    <link href="/css/all.min.css" rel="stylesheet" media="screen">
+    <!-- Animated Css -->
+    <link href="/css/animate.css" rel="stylesheet">
+    <!-- Magnific Css -->
+    <link href="/css/magnific-popup.css" rel="stylesheet">
+    <!-- Main Custom Css -->
+    <link href="/css/custom.css" rel="stylesheet" media="screen">
+    <link href="/css/service-list-upgrade.css" rel="stylesheet" media="screen">
+<link href="/css/brand.css" rel="stylesheet">
+<%- include('../partials/chat') %>
+<link href="/css/zoom.css" rel="stylesheet">
+</head>
+
+<body class="tt-magic-cursor">
+
+    <!-- Preloader Start -->
+    <div class="preloader" role="status" aria-label="Loading page" hidden>
+        <span class="preloader-spinner" aria-hidden="true"></span>
+    </div>
+    <script src="/js/preloader.js"></script>
+    <!-- Preloader End -->
+
+    <!-- Magic Cursor Start -->
+    <div id="magic-cursor">
+        <div id="ball"></div>
+    </div>
+    <!-- Magic Cursor End -->
+
+    <!-- Topbar Section Start -->
+    <div class="topbar">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-9 col-md-8">
+                    <!-- Topbar Contact Information Start -->
+                    <div class="topbar-contact-info">
+                        <ul>
+                            <li><a href="locations.html"><i class="fa-solid fa-location-dot"></i>Global Locations</a></li>
+                            <li><a class="topbar-contact-link" href="mailto:<%= business.email %>"><i class="fa-solid fa-envelope"></i><span><strong>Email Our Team</strong> <%= business.email %></span></a></li>
+                        </ul>
+                    </div>
+                    <!-- Topbar Contact Information End -->
+                </div>
+
+                <div class="col-lg-3 col-md-4">
+                    <!-- Topbar Social Links Start -->
+                    <div class="topbar-social-links">
+                        <ul>
+                            <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
+                            <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
+                            <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
+                        </ul>
+                    </div>
+                    <!-- Topbar Social Links End -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Topbar Section End -->
+
+    <!-- Header Start -->
+    <header class="main-header">
+        <div class="header-sticky">
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    <!-- Logo Start -->
+                    <a class="navbar-brand" href="/" aria-label="<%= business.name %> home"><span class="brand-mark"><span class="brand-initials" aria-hidden="true"><i class="fa-solid fa-paw"></i></span><span class="brand-name">Lancaster <small>Pet Movers</small></span></span></a>
+                    <!-- Logo End -->
+    
+                    <!-- Main Menu Start -->
+                    <div class="collapse navbar-collapse main-menu">
+                        <ul class="navbar-nav mr-auto" id="menu">
+                            <li class="nav-item has-submen"><a class="nav-link" href="index.html">Home</a>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="about-us.html">About Us</a></li>
+                            <li class="nav-item has-submenu"><a class="nav-link" href="service.html">Services</a>
+                                <ul class="sub-menu">
+                                    <li class="nav-item"><a class="nav-link" href="ocean-freight.html">Ocean Freight</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="air-freight.html">Air Freight</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="cargo-freight.html">Cargo Freight</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="express-delivery.html">Express Delivery</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="customs-clearance.html">Customs Clearance</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="project-cargo.html">Project Cargo</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="pet-transport.html">Pet Transport</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="reviews.html">Reviews</a></li>
+                            <li class="nav-item"><a class="nav-link" href="locations.html">Locations</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/track">Track</a></li>                            
+                            <li class="nav-item has-submenu"><a class="nav-link" href="#">Pet Delivery</a>
+                                <ul class="sub-menu">
+                                    <li class="nav-item"><a class="nav-link" href="pet-transport.html">Pet Transport</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="faqs.html">FAQs</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item"><a class="nav-link" href="contact.html">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    <!-- Main Menu End -->
+
+                    <div class="navbar-toggle"></div>                         
+                </div>
+            </nav>
+
+            <div class="responsive-menu"></div>
+        </div>
+    </header>
+    <!-- Header End -->
+
+    <!-- subpage header Start -->
+    <div class="page-header parallaxie">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-12">
+                    <!-- Page Header box Start -->
+                    <div class="page-header-box">
+                        <h2 class="text-anime-style-3">Our Services</h2>
+                        <nav class="wow fadeInUp" data-wow-delay="0.25s">
+                            <ol class="breadcrumb">
+                                <li><a href="index.html">Home</a></li>
+                                <li> Services</li>
+                            </ol>
+                        </nav>                                
+                    </div>
+                    <!-- Page Header Box End -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+    <!-- Services List Page Start -->
+    <div class="service-page">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 col-md-6">
+                    <!-- Our Service Item Start -->
+                    <div class="our-service-item wow fadeInUp" data-wow-delay="0.25s" data-service="ocean-freight">
+                        <!-- Our Service Image Start -->
+                        <div class="our-service-image">
+                            <figure class="image-anime">
+                                <img src="/images/service-1.jpg" alt="">
+                            </figure>
+                        </div>
+                        <!-- Our Service Image End -->
+                        
+                        <!-- Our Service Content Start -->
+                        <div class="our-service-content">
+                            <div class="service-content-box">
+                                <div class="our-service-icon"><i class="fa-solid fa-ship" aria-hidden="true"></i></div>
+                                <div class="our-service-title">
+                                    <h2><a href="ocean-freight.html">Ocean Freight</a></h2>
+                                    <p class="service-summary">Full and shared container shipping, with coordinated port handling, paperwork, and onward delivery.</p>
+                                </div>
+                            </div>
+                            <div class="our-service-content-button">
+                                <a href="ocean-freight.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
+                            </div>                         
+                        </div>
+                        <!-- Our Service Content End -->
+                    </div> 
+                    <!-- Our Service Item End -->
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <!-- Our Service Item Start -->
+                    <div class="our-service-item wow fadeInUp" data-wow-delay="0.5s" data-service="air-freight">
+                        <!-- Our Service Image Start -->
+                        <div class="our-service-image">
+                            <figure class="image-anime">
+                                <img src="/images/service-2.jpg" alt="">
+                            </figure>
+                        </div>
+                        <!-- Our Service Image End -->
+                        
+                        <!-- Our Service Content Start -->
+                        <div class="our-service-content">
+                            <div class="service-content-box">
+                                <div class="our-service-icon"><i class="fa-solid fa-plane-departure" aria-hidden="true"></i></div>
+                                <div class="our-service-title">
+                                    <h2><a href="air-freight.html">Air Freight</a></h2>
+                                    <p class="service-summary">Air freight for urgent shipments, with support from pickup and flight planning to arrival.</p>
+                                </div>
+                            </div>
+                            <div class="our-service-content-button">
+                                <a href="air-freight.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
+                            </div>                         
+                        </div>
+                        <!-- Our Service Content End -->
+                    </div> 
+                    <!-- Our Service Item End -->
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <!-- Our Service Item Start -->
+                    <div class="our-service-item wow fadeInUp" data-wow-delay="0.75s" data-service="cargo-freight">
+                        <!-- Our Service Image Start -->
+                        <div class="our-service-image">
+                            <figure class="image-anime">
+                                <img src="/images/service-3.jpg" alt="">
+                            </figure>
+                        </div>
+                        <!-- Our Service Image End -->
+                        
+                        <!-- Our Service Content Start -->
+                        <div class="our-service-content">
+                            <div class="service-content-box">
+                                <div class="our-service-icon"><i class="fa-solid fa-truck-moving" aria-hidden="true"></i></div>
+                                <div class="our-service-title">
+                                    <h2><a href="cargo-freight.html">Cargo Freight</a></h2>
+                                    <p class="service-summary">Road and multimodal transport for pallets, commercial goods, equipment, and general cargo.</p>
+                                </div>
+                            </div>
+                            <div class="our-service-content-button">
+                                <a href="cargo-freight.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
+                            </div>                         
+                        </div>
+                        <!-- Our Service Content End -->
+                    </div> 
+                    <!-- Our Service Item End -->
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <!-- Our Service Item Start -->
+                    <div class="our-service-item wow fadeInUp" data-wow-delay="1s" data-service="express-delivery">
+                        <!-- Our Service Image Start -->
+                        <div class="our-service-image">
+                            <figure class="image-anime">
+                                <img src="/images/service-4.jpg" alt="">
+                            </figure>
+                        </div>
+                        <!-- Our Service Image End -->
+                        
+                        <!-- Our Service Content Start -->
+                        <div class="our-service-content">
+                            <div class="service-content-box">
+                                <div class="our-service-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></div>
+                                <div class="our-service-title">
+                                    <h2><a href="express-delivery.html">Express Delivery</a></h2>
+                                    <p class="service-summary">Priority handling for documents, parcels, parts, and business shipments, with updates at key stages.</p>
+                                </div>
+                            </div>
+                            <div class="our-service-content-button">
+                                <a href="express-delivery.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
+                            </div>                         
+                        </div>
+                        <!-- Our Service Content End -->
+                    </div> 
+                    <!-- Our Service Item End -->
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <!-- Our Service Item Start -->
+                    <div class="our-service-item wow fadeInUp" data-wow-delay="1.25s" data-service="customs-clearance">
+                        <!-- Our Service Image Start -->
+                        <div class="our-service-image">
+                            <figure class="image-anime">
+                                <img src="/images/service-5.jpg" alt="">
+                            </figure>
+                        </div>
+                        <!-- Our Service Image End -->
+                        
+                        <!-- Our Service Content Start -->
+                        <div class="our-service-content">
+                            <div class="service-content-box">
+                                <div class="our-service-icon"><i class="fa-solid fa-file-circle-check" aria-hidden="true"></i></div>
+                                <div class="our-service-title">
+                                    <h2><a href="customs-clearance.html">Customs Clearance</a></h2>
+                                    <p class="service-summary">Document reviews and customs coordination to support international imports and exports.</p>
+                                </div>
+                            </div>
+                            <div class="our-service-content-button">
+                                <a href="customs-clearance.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
+                            </div>                         
+                        </div>
+                        <!-- Our Service Content End -->
+                    </div> 
+                    <!-- Our Service Item End -->
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <!-- Our Service Item Start -->
+                    <div class="our-service-item wow fadeInUp" data-wow-delay="1.5s" data-service="project-cargo">
+                        <!-- Our Service Image Start -->
+                        <div class="our-service-image">
+                            <figure class="image-anime">
+                                <img src="/images/service-6.jpg" alt="">
+                            </figure>
+                        </div>
+                        <!-- Our Service Image End -->
+                        
+                        <!-- Our Service Content Start -->
+                        <div class="our-service-content">
+                            <div class="service-content-box">
+                                <div class="our-service-icon"><i class="fa-solid fa-gears" aria-hidden="true"></i></div>
+                                <div class="our-service-title">
+                                    <h2><a href="project-cargo.html">Project Cargo</a></h2>
+                                    <p class="service-summary">Detailed transport planning for heavy, oversized, valuable, and complex shipments.</p>
+                                </div>
+                            </div>
+                            <div class="our-service-content-button">
+                                <a href="project-cargo.html">Learn More <i class="fa-regular fa-circle-right"></i></a>
+                            </div>                         
+                        </div>
+                        <!-- Our Service Content End -->
+                    </div> 
+                    <!-- Our Service Item End -->
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="our-service-item wow fadeInUp" data-wow-delay="1.75s">
+                        <div class="our-service-image"><figure class="image-anime"><img src="/images/post-22.jpeg" alt="Pets prepared for safe transportation"></figure></div>
+                        <div class="our-service-content">
+                            <div class="service-content-box">
+                                <div class="our-service-icon"><i class="fa-solid fa-paw" aria-hidden="true"></i></div>
+                                <div class="our-service-title"><h2><a href="pet-transport.html">Pet Transport</a></h2><p class="service-summary">Pet travel coordination covering preparation, paperwork, carrier arrangements, and journey updates.</p></div>
+                            </div>
+                            <div class="our-service-content-button"><a href="pet-transport.html">Learn More <i class="fa-regular fa-circle-right"></i></a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Services List Page End -->
+
+    <!-- Main Footer Start  -->
+    <footer class="main-footer">
+        <!-- Mega Footer Start -->
+        <div class="mega-footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-12">
+                        <!-- Footer About Start -->
+                        <div class="footer-about">
+                            <!-- Footer Heading Start -->
+                            <div class="footer-heading">
+                                <figure>
+                                    <span class="brand-mark brand-mark-footer"><span class="brand-initials" aria-hidden="true"><i class="fa-solid fa-paw"></i></span><span class="brand-name">Lancaster <small>Pet Movers</small></span></span>
+                                </figure>
+                            </div>
+                            <!-- Footer Heading End -->
+
+                            <!-- Footer Content Start -->
+                            <div class="footer-content">
+                                <p>We help you navigate shipping with clear advice and coordinated transport.</p>
+                            </div>
+                            <!-- Footer Content End -->
+
+                            <!-- Footer Social Link Start -->
+                            <div class="footer-social-link">
+                                <ul>
+                                    <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
+                                    <li><a href="#"><i class="fa-brands fa-twitter"></i></a></li>
+                                    <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li> 
+                                </ul>
+                            </div>
+                            <!-- Footer Social Link End -->
+                        </div>  
+                        <!-- Footer About End -->                         
+                    </div>
+
+                    <div class="col-lg-2 col-md-6 col-12">
+                        <!-- Footer links Start -->
+                        <div class="footer-links">
+                            <div class="footer-info-heading">
+                                <h2>Quick Links</h2>
+                            </div>
+                            <ul>
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="about-us.html">About Us</a></li>
+                               <li><a href="service.html">Services</a></li>
+                                <li><a href="reviews.html">Reviews</a></li>
+                                <li><a href="locations.html">Locations</a></li>
+                                <li><a href="/track">Track</a></li>
+                                <li><a href="contact.html">Contact Us</a></li>
+                            </ul>
+                        </div>
+                        <!-- Footer links End -->
+                    </div>                        
+
+                    <div class="col-lg-3 col-md-6 col-12">
+                        <!-- Footer Contact Info Start -->
+                        <div class="footer-contact-info">
+                            <!-- footer info heading Start -->
+                            <div class="footer-info-heading">
+                                <h2>Contact Us</h2>
+                            </div>
+                            <!-- footer info heading End -->
+
+                            <!-- Footer Contact Info Box Start -->
+                            <div class="footer-contact-box">
+                                <div class="footer-info-box">
+                                    <div class="icon-box">
+                                        <i class="fa-regular fa-envelope"></i>
+                                    </div>
+
+                                    <p><%= business.email %></p>
+                                </div>
+
+                                <div class="footer-info-box">
+                                    <div class="icon-box">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+                                    
+                                    <p><a href="locations.html">United States &middot; Australia &middot; United Kingdom &middot; New Zealand &middot; Global</a></p>									
+                                </div>
+
+                            </div>
+                            <!-- Footer Contact Info Box End -->
+                        </div>
+                    </div>
+                    <!-- Footer Contact Info End -->
+
+                    <!-- Subscribe Newsletters Start  -->
+                    <div class="col-lg-3 col-md-6 col-12">
+                        <!-- footer info heading Start -->
+                        <div class="footer-info-heading">
+                            <h2>Newsletter</h2>
+                        </div>
+                        <!-- footer info heading End -->
+
+                        <!-- Newsletters Content Start -->
+                        <div class="newsletters-content">
+                            <p>Sign up for shipping news, service updates, and practical logistics insights.</p>
+                        </div>
+                        <!-- Newsletters Content End -->
+
+                        <!-- Newsletters Form Start -->
+                        <div class="newsletters-form">
+                            <form id="newslettersForm" action="/subscribe" method="post" class="mail-box"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <div class="row no-gutters">
+                                    <div class="form-group col-11">
+                                        <input type="email" name="email" class="form-control" placeholder="Your email address" required>
+                                    </div>
+                                    <div class="col-1">
+                                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Newsletters Form End -->
+                    </div>
+                    <!-- Subscribe Newsletters End  -->
+                </div>
+            </div>
+        </div>
+        <!-- Mega Footer End -->
+    </footer>
+    <!-- Main footer End -->
+
+    <!-- Footer Copyright Section Start -->
+    <div class="footer-copyright-links">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-7 col-12">
+                    <!-- Footer Copyright Content Start -->
+                    <div class="footer-copyright">
+                        <p>Copyright <%= year %>  <b><%= business.name %>.</b> All rights reserved.</p>
+                    </div>
+                    <!-- Footer Copyright Content End -->
+                </div>
+                <div class="col-lg-6 col-md-5 col-12">
+                    <!-- Footer Policy Links Start -->
+                    <div class="footer-policy-links">
+                        <ul>
+                            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                            <li><a href="terms-of-service.html">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <!-- Footer Policy Links End -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer Copyright Section End -->
+
+    <!-- Jquery Library File -->
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <!-- Bootstrap js File -->
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- Validator js File -->
+    <script src="/js/validator.min.js"></script>
+    <!-- SlickNav js File -->
+    <script src="/js/jquery.slicknav.js"></script>
+    <!-- Swiper js File -->
+    <script src="/js/swiper-bundle.min.js"></script>
+    <!-- Counter js File -->
+    <script src="/js/jquery.waypoints.min.js"></script>
+    <script src="/js/jquery.counterup.min.js"></script>
+    <!-- Magnific js File -->
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <!-- SmoothScroll -->
+    <script src="/js/SmoothScroll.js"></script>
+    <!-- Parallax js -->
+    <script src="/js/parallaxie.js"></script>
+    <!-- MagicCursor js File -->
+    <script src="/js/gsap.min.js"></script>
+    <script src="/js/magiccursor.js"></script>
+    <!-- Text Effect js File -->
+    <script src="/js/SplitText.js"></script>
+    <script src="/js/ScrollTrigger.min.js"></script>
+    <!-- YTPlayer js File -->
+    <script src="/js/jquery.mb.YTPlayer.min.js"></script>
+    <!-- Wow js File -->
+    <script src="/js/wow.js"></script>
+    <!-- Main Custom js File -->
+    <script src="/js/function.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title><%= business.name %> | Tracking Information</title>
+<link rel="shortcut icon" href="/images/img/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="/css/all.min.css" rel="stylesheet">
+<link href="/css/tracking.css" rel="stylesheet">
+<style>
+  body { font-family: "Poppins", system-ui, sans-serif; }
+  .search .ip + .ip { border-inline-start: 1px solid var(--line); }
+  .awb { margin-top: 18px; }
+  .awb summary { cursor: pointer; font-weight: 700; font-size: 13px; opacity: .95; }
+  .awb .search { margin-top: 12px; }
+  .note { margin-top: 18px; background: rgba(255,255,255,.95); color: var(--ink); border-radius: 14px; padding: 14px 18px; text-align: start; font-size: 14px; }
+  .note.err { border-inline-start: 4px solid var(--accent); }
+  .note a { color: var(--accent-2); font-weight: 700; }
+  .tl.skipped .node { opacity: .5; }
+  .docs li { list-style: none; display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .docs li:last-child { border-bottom: 0; }
+  .docs .ok { color: var(--ok); } .docs .wait { color: #b7791f; }
+  .warn { margin-top: 18px; display: flex; gap: 10px; background: #fff7ef; border: 1px solid #f3d3b8; border-radius: 14px; padding: 14px 16px; font-size: 13px; }
+  .warn i { color: var(--accent); margin-top: 3px; }
+  @media (max-width: 600px) { .search .ip + .ip { border-inline-start: 0; border-top: 1px solid var(--line); } }
+</style>
+<%- include('../partials/chat') %>
+<link href="/css/zoom.css" rel="stylesheet">
+</head>
+<body>
+<% const freight = booking && domain.isFreight(booking.service_type); %>
+<div class="hero">
+  <div class="wrap">
+    <div class="top">
+      <a class="logo" href="/"><span class="mark"><i class="fa-solid fa-paw"></i></span> <%= business.name %></a>
+      <div class="top-actions"><a class="home" href="/"><i class="fas fa-arrow-left"></i> <span>Back to Home</span></a></div>
+    </div>
+
+    <% if (quote) { %>
+    <div class="lead">
+      <div class="eyebrow">Tracking Information</div>
+      <div class="trk"><%= quote.ref %></div>
+      <span class="pill"><i class="fa-solid fa-file-signature"></i> Quote request: <%= QUOTE_STATUSES[quote.status] || quote.status %></span>
+      <div class="meta">
+        <div><b>Service</b><%= domain.label(domain.SERVICE_TYPES, quote.service_type) %></div>
+        <div><b>From</b><%= quote.origin %></div>
+        <div><b>To</b><%= quote.destination %></div>
+        <div><b>Received</b><%= fmtDate(String(quote.created_at).slice(0, 10)) %></div>
+      </div>
+    </div>
+    <% } else if (!booking) { %>
+    <div class="center"><div class="spanel">
+      <div class="eyebrow">Tracking Information</div>
+      <h1>Enter a tracking number</h1>
+      <p class="sub">Your tracking number is in your booking email and starts with LPM-B-.</p>
+      <form class="search" method="post" action="/track">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="ip"><i class="fas fa-hashtag"></i><input type="text" name="ref" value="<%= ref %>" placeholder="Enter your tracking number" autocomplete="off" autocapitalize="characters" spellcheck="false" required aria-label="Tracking number"></div>
+        <button class="sbtn" type="submit"><i class="fas fa-magnifying-glass"></i> Track Shipment</button>
+      </form>
+      <% if (lookupError) { %><div class="note err" role="alert"><i class="fas fa-circle-exclamation"></i> <%= lookupError %></div><% } %>
+
+      <details class="awb" <%= awbInput ? 'open' : '' %>>
+        <summary><i class="fas fa-plane"></i> Shipping by air? Look up an air waybill</summary>
+        <form class="search" method="get" action="/track">
+          <div class="ip"><i class="fas fa-plane-departure"></i><input type="text" name="awb" value="<%= awbInput %>" placeholder="Air waybill, e.g. 006-12345675" inputmode="numeric" required aria-label="Air waybill number"></div>
+          <button class="sbtn" type="submit"><i class="fas fa-magnifying-glass"></i> Look up</button>
+        </form>
+        <% if (awbResult) { %>
+          <% if (!awbResult.valid) { %>
+            <div class="note err" role="alert"><%= awbResult.error %></div>
+          <% } else { %>
+            <div class="note" role="status">Air waybill <b><%= awbResult.formatted %></b>
+              <% if (awbResult.airline) { %>is issued by <b><%= awbResult.airline.name %></b>. Check live flight status on the airline's own site: <a href="<%= awbResult.airline.url %>" target="_blank" rel="noopener noreferrer"><%= awbResult.airline.url.replace('https://', '') %></a>
+              <% } else { %>has airline prefix <b><%= awbResult.prefix %></b>. Check it on the issuing airline's cargo website, or contact us.<% } %>
+            </div>
+          <% } %>
+        <% } %>
+      </details>
+
+      <div class="tips">
+        <h4><i class="fas fa-circle-question"></i> Tracking Tips:</h4>
+        <div class="tg">
+          <span><i class="fas fa-circle-check"></i> Your tracking number is in your booking email</span>
+          <span><i class="fas fa-circle-check"></i> Capitals and spaces don't matter</span>
+          <span><i class="fas fa-circle-check"></i> Air shipments: track the flight with the airline</span>
+          <span><i class="fas fa-circle-check"></i> Contact support if issues persist</span>
+        </div>
+      </div>
+    </div></div>
+
+    <% } else { %>
+    <div class="lead">
+      <div class="eyebrow">Tracking Information</div>
+      <div class="trk"><%= booking.ref %></div>
+      <span class="pill"><i class="fa-solid <%= BOOKING_STATUSES[booking.status].icon %>"></i> <%= BOOKING_STATUSES[booking.status].label %></span>
+      <div class="meta">
+        <div><b>Type</b><%= domain.SHIPMENT_KINDS[domain.kindOf(booking.service_type) || "pet"].label %></div>
+        <div><b>Service</b><%= domain.label(domain.SERVICE_TYPES, booking.service_type) %></div>
+        <div><b>From</b><%= booking.origin %></div>
+        <div><b>To</b><%= booking.destination %></div>
+        <div><b><%= freight ? 'Ship date' : 'Travel date' %></b><%= fmtDate(booking.travel_date) %></div>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<% if (quote) { %>
+<div class="stage"><div class="wrap">
+  <div class="panel">
+    <div class="tl-title"><i class="fas fa-file-signature"></i> Quote request</div>
+    <p><%= quote.status === 'declined' ? 'This quote request has been closed. Please contact us if you have questions.'
+      : quote.status === 'quoted' ? 'Your quote has been sent to you by email. Reply to it or contact us to go ahead. Once you book, you will get a booking tracking number (LPM-B-…).'
+      : 'We have received your request and a coordinator is reviewing it. You will receive a written quote by email, usually within one business day.' %></p>
+    <div class="warn"><i class="fas fa-triangle-exclamation"></i><div>We never ask for payment by gift card, cryptocurrency or money-transfer app, and never ask for extra money to release a shipment or pet in transit. If anyone does, contact us before doing anything.</div></div>
+    <p style="margin-top:18px"><a href="/track" style="color:var(--accent-2);font-weight:700"><i class="fas fa-magnifying-glass"></i> Track another number</a></p>
+  </div>
+</div></div>
+<% } %>
+<% if (booking) { const idx = BOOKING_FLOW.indexOf(booking.status); const cancelled = booking.status === 'cancelled'; %>
+<div class="stage"><div class="wrap">
+  <div class="panel">
+    <p style="margin:0"><%= BOOKING_STATUSES[booking.status].customer %></p>
+    <div class="cols">
+      <div>
+        <div class="tl-title"><i class="fas fa-route"></i> Shipment progress</div>
+        <% if (cancelled) { %>
+          <div class="note err" style="margin-top:0">This booking was cancelled. Please contact us if you have questions.</div>
+        <% } else { %>
+        <div class="timeline">
+          <% BOOKING_FLOW.forEach((s, i) => { const st = BOOKING_STATUSES[s]; const done = i < idx && reached.has(s); const cur = i === idx; %>
+            <div class="tl <%= done ? 'done' : cur ? 'cur' : (i < idx ? 'skipped' : '') %>">
+              <div class="node"><i class="fas <%= done ? 'fa-check' : st.icon %>"></i></div>
+              <h4><%= st.label %></h4>
+              <div class="when"><%= cur ? 'Current stage' : done ? 'Completed' : i < idx ? 'Not required' : 'Upcoming' %></div>
+            </div>
+          <% }) %>
+        </div>
+        <% } %>
+      </div>
+      <div class="side panel" style="box-shadow:none;padding:18px">
+        <div class="blk">
+          <h5><i class="fas fa-box"></i> <%= freight ? 'Shipment' : 'Pet' %></h5>
+          <div class="row2"><span class="k"><%= freight ? 'Cargo' : 'Pet' %></span><span class="v"><%= domain.itemName(booking) %></span></div>
+          <% if (booking.pet_count > 1) { %><div class="row2"><span class="k"><%= freight ? 'Pieces' : 'Pets' %></span><span class="v"><%= booking.pet_count %></span></div><% } %>
+          <% if (booking.weight_lbs) { %><div class="row2"><span class="k">Weight</span><span class="v"><%= booking.weight_lbs %> lbs</span></div><% } %>
+        </div>
+        <% if (booking.status === 'scheduled') { %>
+        <div class="blk">
+          <h5><i class="fas fa-truck-fast"></i> Transport</h5>
+          <% if (booking.pickup_window) { %><div class="row2"><span class="k">Pickup window</span><span class="v"><%= booking.pickup_window %></span></div><% } %>
+          <% if (booking.flight_details) { %><div class="row2"><span class="k"><%= domain.isAir(booking.service_type) ? 'Flight' : 'Details' %></span><span class="v"><%= booking.flight_details %></span></div><% } %>
+          <% if (awbResult && awbResult.valid) { %>
+            <div class="row2"><span class="k">Air waybill</span><span class="v"><%= awbResult.formatted %></span></div>
+            <% if (awbResult.airline) { %><div class="row2"><span class="k">Airline</span><span class="v"><a href="<%= awbResult.airline.url %>" target="_blank" rel="noopener noreferrer"><%= awbResult.airline.name %></a></span></div><% } %>
+          <% } %>
+        </div>
+        <% } %>
+        <% if (documents.length && !cancelled) { %>
+        <div class="blk">
+          <h5><i class="fas fa-file-lines"></i> Document checklist</h5>
+          <ul class="docs" style="padding:0;margin:0">
+            <% documents.forEach((d) => { %><li><i class="fas <%= d.received ? 'fa-circle-check ok' : 'fa-clock wait' %>"></i><span><%= d.label %><%= d.received ? '' : ' (needed)' %></span></li><% }) %>
+          </ul>
+        </div>
+        <% } %>
+      </div>
+    </div>
+    <div class="warn"><i class="fas fa-triangle-exclamation"></i><div>We never ask for payment by gift card, cryptocurrency or money-transfer app, and never ask for extra money to release a shipment or pet in transit. If anyone does, contact us before doing anything.</div></div>
+    <p style="margin-top:18px"><a href="/track" style="color:var(--accent-2);font-weight:700"><i class="fas fa-magnifying-glass"></i> Track another booking</a></p>
+  </div>
+</div></div>
+<% } %>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<%- include('_top') %>
+<%
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const LEVEL = { critical: 'Urgent', warning: 'Soon', info: 'To do' };
+%>
+<header class="dash-head">
+  <div>
+    <p class="dash-date"><%= today %></p>
+    <h1><%= greet %>, <%= admin.name.split(' ')[0] %></h1>
+  </div>
+  <div class="dash-tools">
+    <form class="dash-search" method="get" action="/admin/search" role="search">
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      <input type="search" name="q" placeholder="Search tracking number, customer, pet…" aria-label="Search bookings, quotes and customers" autocomplete="off">
+    </form>
+    <a class="btn btn-dark btn-sm" href="/admin/bookings/new"><i class="fa-solid fa-plus"></i> New booking</a>
+  </div>
+</header>
+
+<div class="dash-stats">
+  <a href="/admin/bookings"><span><%= stats.active %></span>Active shipments</a>
+  <a href="#coming-up"><span><%= stats.departingWeek %></span>Departing this week</a>
+  <a href="/admin/quotes?status=new"><span><%= stats.newQuotes %></span>New quote requests</a>
+  <a href="/admin/bookings?status=documents_pending"><span><%= stats.docsWaiting %></span>Missing documents</a>
+</div>
+
+<div class="dash-grid">
+  <section class="dash-card">
+    <h2>Needs attention</h2>
+    <% if (!attention.length) { %>
+      <p class="dash-calm"><i class="fa-solid fa-circle-check"></i> You're all caught up.</p>
+    <% } else { %>
+      <ul class="dash-list">
+        <% attention.slice(0, 6).forEach((a) => { %>
+          <li><a href="<%= a.link %>">
+            <span class="dot dot-<%= a.level %>" aria-hidden="true"></span>
+            <span class="dash-text"><strong><%= a.title %></strong><small><%= LEVEL[a.level] %> · <%= a.detail %></small></span>
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          </a></li>
+        <% }) %>
+      </ul>
+      <% if (attention.length > 6) { %><p class="dash-more">+ <%= attention.length - 6 %> more</p><% } %>
+    <% } %>
+  </section>
+
+  <section class="dash-card" id="coming-up">
+    <h2>Coming up <a href="/admin/bookings">All bookings</a></h2>
+    <% if (!upcoming.length) { %>
+      <p class="dash-calm"><i class="fa-regular fa-calendar"></i> Nothing departing in the next 30 days.</p>
+    <% } else { %>
+      <ul class="dash-list">
+        <% upcoming.slice(0, 6).forEach((b) => {
+             const dt = b.travel_date ? new Date(b.travel_date + 'T12:00:00Z') : null; %>
+          <li><a href="/admin/bookings/<%= b.id %>">
+            <span class="dash-day"><% if (dt) { %><b><%= dt.toLocaleDateString('en-US', { day: 'numeric', timeZone: 'UTC' }) %></b><%= dt.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' }) %><% } else { %><b>–</b>TBC<% } %></span>
+            <span class="dash-text"><strong><%= domain.itemName(b) %></strong><small><%= b.origin %> → <%= b.destination %></small></span>
+            <span class="dash-meta"><%= domain.label(domain.BOOKING_STATUSES, b.status) %><small><%= b.docs_received %>/<%= b.docs_total %> documents</small></span>
+          </a></li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </section>
+</div>
+<%- include('_bottom') %>

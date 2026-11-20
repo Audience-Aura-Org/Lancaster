@@ -1,0 +1,42 @@
+.service-page .row { row-gap: 30px; }
+.service-page .our-service-item { height: 100%; margin-bottom: 0; overflow: hidden; border: 1px solid var(--divider-color); border-radius: 14px; background: var(--white-color); box-shadow: 0 14px 40px rgba(3, 75, 91, .08); transition: transform .3s ease, box-shadow .3s ease; }
+.service-page .our-service-item:hover { transform: translateY(-6px); box-shadow: 0 18px 50px rgba(3, 75, 91, .14); }
+.service-page .our-service-image { border-radius: 0; }
+.service-page .our-service-image img { aspect-ratio: 16 / 10; border-radius: 0; }
+.service-page .our-service-content { display: block; margin-top: 0; padding: 26px; }
+.service-page .service-content-box { align-items: flex-start; width: 100%; padding: 0; box-shadow: none; }
+.service-page .our-service-icon { flex: 0 0 48px; display: grid; place-items: center; width: 48px; height: 48px; margin-right: 15px; border-radius: 10px; background: var(--secondary-color); }
+.service-page .our-service-icon img { max-width: 31px; max-height: 31px; }
+.service-page .our-service-icon i { color: var(--accent-color); font-size: 25px; }
+.service-page .our-service-title h2 { margin-bottom: 10px; }
+.service-page .our-service-title h2 a { color: var(--primary-color); transition: color .2s ease; }
+.service-page .our-service-title h2 a:hover { color: var(--accent-color); }
+.service-page .service-summary { color: var(--text-color); font-size: 15px; line-height: 1.65; }
+.service-page .our-service-content-button { width: auto; margin: 22px 0 0 63px; padding: 0; text-align: left; background: transparent; }
+.service-page .our-service-content-button a { display: inline-flex; align-items: center; gap: 9px; color: var(--accent-color); font-size: 15px; font-weight: 800; }
+.service-page .our-service-content-button a i { color: inherit; font-size: 19px; }
+.service-page .our-service-content-button a:hover,
+.service-page .our-service-content-button a:hover i { color: var(--primary-color); }
+@media (max-width: 575px) { .service-page .our-service-content { padding: 22px; } .service-page .our-service-content-button { margin-left: 0; } }
+
+.home-service-upgrade .row { row-gap: 30px; }
+.home-service-upgrade .our-service-item { height: 100%; margin-bottom: 0; overflow: hidden; border: 1px solid var(--divider-color); border-radius: 14px; background: var(--white-color); box-shadow: 0 14px 40px rgba(3, 75, 91, .08); transition: transform .3s ease, box-shadow .3s ease; }
+.home-service-upgrade .our-service-item:hover { transform: translateY(-6px); box-shadow: 0 18px 50px rgba(3, 75, 91, .14); }
+.home-service-upgrade .our-service-image { border-radius: 0; }
+.home-service-upgrade .our-service-image img { aspect-ratio: 16 / 10; border-radius: 0; }
+.home-service-upgrade .our-service-content { display: block; min-height: 245px; margin-top: 0; padding: 26px; }
+.home-service-upgrade .service-content-box { align-items: flex-start; width: 100%; padding: 0; box-shadow: none; }
+.home-service-upgrade .our-service-icon:empty { display: none; }
+.home-service-upgrade .our-service-icon { flex: 0 0 48px; display: grid; place-items: center; width: 48px; height: 48px; margin-right: 15px; border-radius: 10px; background: var(--secondary-color); }
+.home-service-upgrade .our-service-icon i { color: var(--accent-color); font-size: 25px; }
+.home-service-upgrade .our-service-title h2 { margin-bottom: 10px; }
+.home-service-upgrade .our-service-title h2 a { color: var(--primary-color); transition: color .2s ease; }
+.home-service-upgrade .our-service-title h2 a:hover { color: var(--accent-color); }
+.home-service-upgrade .service-summary { color: var(--text-color); font-size: 15px; line-height: 1.65; }
+.home-service-upgrade .our-service-content-button { width: auto; margin: 22px 0 0; padding: 0; text-align: left; background: transparent; }
+.home-service-upgrade .our-service-content-button a { display: inline-flex; align-items: center; gap: 9px; color: var(--accent-color); font-size: 15px; font-weight: 800; }
+.home-service-upgrade .our-service-content-button a i { color: inherit; font-size: 19px; }
+.home-service-upgrade .our-service-content-button a:hover,
+.home-service-upgrade .our-service-content-button a:hover i { color: var(--primary-color); }
+.home-service-upgrade .our-service-footer { margin-top: 45px; }
+@media (max-width: 767px) { .home-service-upgrade .our-service-content { min-height: 0; padding: 22px; } }

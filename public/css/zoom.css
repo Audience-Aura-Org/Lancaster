@@ -1,0 +1,20 @@
+/*
+ * Site-wide 80% zoom (desktop and mobile). Loaded last on every page.
+ * --zoom is the single place to change it; the rules below compensate for the
+ * few things that measure the real screen (full-height layouts, mouse position).
+ */
+:root { --zoom: 0.8; }
+html { zoom: var(--zoom); }
+
+/* Full-height layouts: viewport units are not zoomed, so scale them back up. */
+body { min-height: calc(100vh / var(--zoom)); }
+.admin-shell, .login-wrap { min-height: calc(100vh / var(--zoom)); }
+
+/* The theme's magic cursor is positioned from the real mouse coordinates;
+   undo the zoom on it so the ball stays under the pointer. */
+#magic-cursor { zoom: calc(1 / var(--zoom)); }
+
+/* Keep form text readable at 80% on phones (16px after zoom). */
+@media (hover: none) and (pointer: coarse) {
+  input, select, textarea { font-size: 20px !important; }
+}

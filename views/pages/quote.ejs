@@ -1,0 +1,137 @@
+<%- include('../partials/theme-top', { heading: 'Request a Quote' }) %>
+<%
+  const K = domain.SHIPMENT_KINDS;
+  const isPet = kind === 'pet';
+  const services = kind ? Object.entries(domain.SERVICE_TYPES).filter(([, s]) => s.category === kind) : [];
+  const err = (k) => errors[k] ? `<div class="lpm-error">${errors[k]}</div>` : '';
+  const val = (k) => values[k] == null ? '' : values[k];
+  const otherKind = isPet ? 'item' : 'pet';
+%>
+<main class="service-detail-page">
+  <div class="container">
+    <% if (!kind) { %>
+      <!-- Step 1: what are you sending? -->
+      <section class="lpm-choose">
+        <div class="service-kicker">Free, no-obligation quote</div>
+        <h1>What are you sending?</h1>
+        <p>Choose one to see the right form. Pets and items have different requirements, so we ask different questions.</p>
+        <div class="lpm-kinds">
+          <a class="lpm-kind" href="/quote?type=pet">
+            <span class="lpm-kind-icon"><i class="fa-solid <%= K.pet.icon %>"></i></span>
+            <strong><%= K.pet.question %></strong>
+            <span><%= K.pet.blurb %></span>
+            <em>Pet transport quote <i class="fa-solid fa-arrow-right"></i></em>
+          </a>
+          <a class="lpm-kind" href="/quote?type=item">
+            <span class="lpm-kind-icon"><i class="fa-solid <%= K.freight.icon %>"></i></span>
+            <strong><%= K.freight.question %></strong>
+            <span><%= K.freight.blurb %></span>
+            <em>Item shipment quote <i class="fa-solid fa-arrow-right"></i></em>
+          </a>
+        </div>
+      </section>
+    <% } else { %>
+    <div class="row service-detail-layout">
+      <aside class="col-lg-4 order-2 order-lg-1">
+        <div class="service-sidebar">
+          <div class="service-nav-card"><h3><%= isPet ? 'Pet services' : 'Item services' %></h3><ul>
+            <% services.forEach(([k, s]) => { %>
+              <li><a href="<%= s.category === 'pet' ? '/pet-transport.html' : '/' + s.slug + '.html' %>"><%= s.label %> <i class="fa-solid fa-arrow-right"></i></a></li>
+            <% }) %>
+          </ul></div>
+          <div class="service-help-card"><h3>What happens next?</h3><p>You get an email confirming your request. A coordinator reviews the details and sends a written quote, usually within one business day.</p><a href="/contact.html">Prefer to talk? Contact us <i class="fa-solid fa-arrow-right ms-2"></i></a></div>
+        </div>
+      </aside>
+
+      <div class="col-lg-8 order-1 order-lg-2">
+        <section class="service-overview">
+          <div class="lpm-kind-badge"><i class="fa-solid <%= K[kind].icon %>"></i> <%= K[kind].label %></div>
+          <h1><%= isPet ? 'Tell us about your pet\'s journey' : 'Tell us about your shipment' %></h1>
+          <p><%= isPet ? 'A few details about your pet and the trip help us recommend the safest option.' : 'Describe what you are sending and where, and we will come back with a written quote.' %>
+            <a href="/quote?type=<%= otherKind %>" class="lpm-switch">Sending <%= isPet ? 'an item' : 'a pet' %> instead?</a></p>
+        </section>
+
+        <form class="lpm-form" method="post" action="/quote" novalidate>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="kind" value="<%= isPet ? 'pet' : 'item' %>">
+          <div style="position:absolute;left:-5000px" aria-hidden="true"><input type="text" name="website" tabindex="-1" autocomplete="off"></div>
+          <% if (Object.keys(errors).length) { %><div class="lpm-alert" role="alert"><i class="fa-solid fa-circle-exclamation"></i> Please check the highlighted fields.</div><% } %>
+
+          <h2 class="service-section-title">Service</h2>
+          <div class="lpm-services <%= errors.service_type ? 'has-error' : '' %>" role="radiogroup" aria-label="Service">
+            <% services.forEach(([k, s]) => { %>
+              <label class="lpm-service">
+                <input type="radio" name="service_type" value="<%= k %>" <%= values.service_type === k || services.length === 1 ? 'checked' : '' %> required>
+                <span><i class="fa-solid <%= s.icon %>"></i><strong><%= s.label %></strong><small><%= s.blurb %></small></span>
+              </label>
+            <% }) %>
+          </div>
+          <%- err('service_type') %>
+
+          <% if (isPet) { %>
+            <h2 class="service-section-title">About your pet</h2>
+            <div class="row">
+              <div class="col-md-6 mb-3 <%= errors.pet_type ? 'has-error' : '' %>">
+                <label for="pet_type">Type of pet *</label>
+                <select class="form-control" id="pet_type" name="pet_type" required>
+                  <option value="">Select…</option>
+                  <% Object.entries(domain.PET_TYPES).forEach(([k, l]) => { %><option value="<%= k %>" <%= values.pet_type === k ? 'selected' : '' %>><%= l %></option><% }) %>
+                </select>
+                <%- err('pet_type') %>
+              </div>
+              <div class="col-md-6 mb-3"><label for="pet_name">Pet's name</label><input class="form-control" id="pet_name" name="pet_name" value="<%= val('pet_name') %>"></div>
+              <div class="col-md-6 mb-3"><label for="breed">Breed</label><input class="form-control" id="breed" name="breed" value="<%= val('breed') %>"></div>
+              <div class="col-md-6 mb-3"><label for="pet_age">Age</label><input class="form-control" id="pet_age" name="pet_age" value="<%= val('pet_age') %>" placeholder="e.g. 3 years"></div>
+              <div class="col-md-6 mb-3"><label for="weight_lbs">Weight (lbs)</label><input class="form-control" type="number" min="0" step="0.1" id="weight_lbs" name="weight_lbs" value="<%= val('weight_lbs') %>"></div>
+              <div class="col-md-6 mb-3"><label for="pet_count">Number of pets</label><input class="form-control" type="number" min="1" id="pet_count" name="pet_count" value="<%= val('pet_count') %>"></div>
+              <div class="col-md-12 mb-3"><label for="special_needs">Health, medication or temperament notes</label><textarea class="form-control" id="special_needs" name="special_needs" rows="3" maxlength="1000" placeholder="e.g. Nervous with strangers, takes daily medication, snub-nosed breed"><%= val('special_needs') %></textarea></div>
+            </div>
+          <% } else { %>
+            <h2 class="service-section-title">About your shipment</h2>
+            <div class="row">
+              <div class="col-md-12 mb-3 <%= errors.cargo_description ? 'has-error' : '' %>">
+                <label for="cargo_description">What are you shipping? *</label>
+                <input class="form-control" id="cargo_description" name="cargo_description" value="<%= val('cargo_description') %>" placeholder="e.g. Machine parts, household goods, signed documents" required>
+                <%- err('cargo_description') %>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="package_type">Packaging</label>
+                <select class="form-control" id="package_type" name="package_type">
+                  <option value="">Select…</option>
+                  <% Object.entries(domain.PACKAGE_TYPES).forEach(([k, l]) => { %><option value="<%= k %>" <%= values.package_type === k ? 'selected' : '' %>><%= l %></option><% }) %>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3"><label for="pet_count">Number of pieces</label><input class="form-control" type="number" min="1" id="pet_count" name="pet_count" value="<%= val('pet_count') %>"></div>
+              <div class="col-md-6 mb-3"><label for="weight_lbs">Total weight (lbs)</label><input class="form-control" type="number" min="0" step="0.1" id="weight_lbs" name="weight_lbs" value="<%= val('weight_lbs') %>"></div>
+              <div class="col-md-6 mb-3"><label for="dimensions">Dimensions</label><input class="form-control" id="dimensions" name="dimensions" value="<%= val('dimensions') %>" placeholder="e.g. 120 x 100 x 150 cm each"></div>
+              <div class="col-md-6 mb-3"><label for="declared_value">Declared value (USD)</label><input class="form-control" type="number" min="0" step="0.01" id="declared_value" name="declared_value" value="<%= val('declared_value') %>"></div>
+              <div class="col-md-12 mb-3"><label for="special_needs">Handling instructions</label><textarea class="form-control" id="special_needs" name="special_needs" rows="3" maxlength="1000" placeholder="e.g. Fragile, keep upright, liftgate needed at delivery"><%= val('special_needs') %></textarea></div>
+            </div>
+          <% } %>
+
+          <h2 class="service-section-title">Route &amp; timing</h2>
+          <div class="row">
+            <div class="col-md-6 mb-3 <%= errors.origin ? 'has-error' : '' %>"><label for="origin"><%= isPet ? 'Travelling from' : 'Collect from' %> (city, state / country) *</label><input class="form-control" id="origin" name="origin" value="<%= val('origin') %>" required><%- err('origin') %></div>
+            <div class="col-md-6 mb-3 <%= errors.destination ? 'has-error' : '' %>"><label for="destination"><%= isPet ? 'Travelling to' : 'Deliver to' %> (city, state / country) *</label><input class="form-control" id="destination" name="destination" value="<%= val('destination') %>" required><%- err('destination') %></div>
+            <div class="col-md-6 mb-3 <%= errors.travel_date ? 'has-error' : '' %>"><label for="travel_date"><%= isPet ? 'Preferred travel date' : 'Ready to ship on' %></label><input class="form-control" type="date" id="travel_date" name="travel_date" value="<%= val('travel_date') %>" data-future><%- err('travel_date') %></div>
+          </div>
+
+          <h2 class="service-section-title">Your details</h2>
+          <div class="row">
+            <div class="col-md-6 mb-3 <%= errors.name ? 'has-error' : '' %>"><label for="name">Full name *</label><input class="form-control" id="name" name="name" value="<%= val('name') %>" autocomplete="name" required><%- err('name') %></div>
+            <div class="col-md-6 mb-3 <%= errors.email ? 'has-error' : '' %>"><label for="email">Email *</label><input class="form-control" type="email" id="email" name="email" value="<%= val('email') %>" autocomplete="email" required><%- err('email') %></div>
+            <div class="col-md-6 mb-3"><label for="phone">Phone</label><input class="form-control" type="tel" id="phone" name="phone" value="<%= val('phone') %>" autocomplete="tel"></div>
+            <div class="col-md-12 mb-3"><label for="message">Anything else we should know?</label><textarea class="form-control" id="message" name="message" rows="3" maxlength="2000"><%= val('message') %></textarea></div>
+            <div class="col-md-12 mb-3 <%= errors.consent ? 'has-error' : '' %>">
+              <label class="lpm-check"><input type="checkbox" name="consent" <%= values.consent ? 'checked' : '' %>> I agree that <%= business.name %> may contact me about this request (see our <a href="/privacy-policy.html">privacy policy</a>).</label>
+              <%- err('consent') %>
+            </div>
+          </div>
+          <button type="submit" class="btn-default"><%= isPet ? 'Request My Pet Quote' : 'Request My Shipping Quote' %></button>
+        </form>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</main>
+<%- include('../partials/theme-bottom') %>
