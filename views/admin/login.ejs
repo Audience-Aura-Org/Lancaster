@@ -21,8 +21,8 @@
     <% flash.forEach((f) => { %><div class="alert alert-<%= f.type === 'error' ? 'error' : 'success' %>"><%= f.message %></div><% }) %>
     <form method="post" action="/admin/login" class="form-grid">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" value="<%= email %>" autocomplete="username" required autofocus></div>
-      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div>
+      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" value="<%= email %>" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required autofocus></div>
+      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required></div>
       <button class="btn btn-primary btn-block" type="submit">Sign in</button>
     </form>
   </div>
