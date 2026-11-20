@@ -49,6 +49,19 @@
     syncDocs();
   }
 
+  // "No documents needed": disable and dim the document lists in the same form.
+  document.querySelectorAll('[data-docs-none]').forEach(function (box) {
+    var form = box.form;
+    var sync = function () {
+      form.querySelectorAll('[data-docs-area]').forEach(function (area) {
+        area.classList.toggle('is-off', box.checked);
+        area.querySelectorAll('input, textarea, select').forEach(function (el) { el.disabled = box.checked; });
+      });
+    };
+    box.addEventListener('change', sync);
+    sync();
+  });
+
   // Auto-submit filter selects.
   document.querySelectorAll('select[data-autosubmit]').forEach(function (s) {
     s.addEventListener('change', function () { s.form.submit(); });

@@ -406,7 +406,7 @@ test('admin can add, remove and restore needed documents', async () => {
   for (const d of docs()) { html = await page(); await admin.post(`/admin/bookings/${b.id}/documents/${d.id}/delete`, { _csrf: tok(html) }); }
   assert.equal(docs().length, 0);
   html = await page();
-  assert.match(html, /No documents needed for this shipment/);
+  assert.match(html, /No documents needed<\/strong> for this shipment/);
   assert.match(db.get().prepare(`SELECT detail FROM audit_log WHERE action = 'document_removed' ORDER BY id DESC`).get().detail, /./);
   // Unknown booking -> 404
   assert.equal((await admin.post('/admin/bookings/999999/documents/add', { _csrf: tok(html), label: 'x' })).status, 404);
@@ -641,6 +641,52 @@ test('lists show a page size choice and next/previous pages', async () => {
   assert.match(html, /is-disabled[^>]*>[^<]*<i class="fa-solid fa-chevron-left"><\/i> Previous/);
   // Quotes list has the pager too
   assert.match((await admin.get('/admin/quotes')).text, /Showing <strong>1–/);
+});
+
+test('new forms show pre-selected documents and allow "no documents needed"', async () => {
+  const admin = await login();
+  const tok = (h) => h.match(/name="_csrf" value="([^"]+)"/)[1];
+  const docsOf = (id) => db.get().prepare('SELECT COUNT(*) n FROM booking_documents WHERE booking_id = ?').get(id).n;
+
+  // Opens with the first service of that kind selected, its documents visible and ticked
+  let html = (await admin.get('/admin/bookings/new?type=pet')).text;
+  assert.match(html, /<option value="domestic_ground" selected>/);
+  assert.match(html, /<div data-docs-for="domestic_ground" >/);
+  assert.match(html, /name="docs_domestic_ground" value="rabies" checked/);
+  assert.match(html, /name="docs_none"/);
+  html = (await admin.get('/admin/bookings/new?type=item&service=air_freight')).text;
+  assert.match(html, /<option value="air_freight" selected>/);
+  assert.match(html, /<div data-docs-for="air_freight" >/);
+
+  // "No documents needed" -> empty checklist (even if boxes were also sent)
+  html = (await admin.get('/admin/bookings/new?type=item')).text;
+  let r = await admin.post('/admin/bookings/new', { _csrf: tok(html), kind: 'item', docs_present: '1', docs_none: 'on', docs_ocean_freight: ['invoice'],
+    name: 'No Docs', email: 'nodocs@example.com', service_type: 'ocean_freight', cargo_description: 'Boxes', origin: 'A', destination: 'B' });
+  const id = Number(r.location.split('/').pop());
+  assert.equal(docsOf(id), 0);
+  html = (await admin.get(`/admin/bookings/${id}`)).text;
+  assert.match(html, /No documents needed<\/strong> for this shipment/);
+  const ref = db.get().prepare('SELECT ref FROM bookings WHERE id = ?').get(id).ref;
+  assert.match((await client().get(`/track?ref=${ref}`)).text, /No documents needed for this shipment/);
+
+  // Converting a quote with "No documents needed"
+  const q = await svc.createQuote({ name: 'Conv None', email: 'convnone@example.com' }, { service_type: 'domestic_air', pet_type: 'dog', origin: 'A', destination: 'B' }, { notifyCustomer: false, notifyStaff: false });
+  html = (await admin.get(`/admin/quotes/${q.id}`)).text;
+  assert.match(html, /name="docs_none"/);
+  r = await admin.post(`/admin/quotes/${q.id}/convert`, { _csrf: tok(html), docs_present: '1', docs_none: 'on' });
+  assert.equal(docsOf(Number(r.location.split('/').pop())), 0);
+
+  // Existing booking: one click clears the checklist; restore brings the standard list back
+  const cust = svc.upsertCustomer({ name: 'Clear Docs', email: 'cleardocs@example.com' });
+  const b = svc.createBooking({ customer_id: cust.id, service_type: 'domestic_ground', pet_type: 'dog', origin: 'A', destination: 'B' });
+  assert.equal(docsOf(b.id), 4);
+  html = (await admin.get(`/admin/bookings/${b.id}`)).text;
+  assert.match(html, /documents\/none/);
+  await admin.post(`/admin/bookings/${b.id}/documents/none`, { _csrf: tok(html) });
+  assert.equal(docsOf(b.id), 0);
+  html = (await admin.get(`/admin/bookings/${b.id}`)).text;
+  assert.match(html, /Restore 4 standard documents/);
+  assert.match(db.get().prepare(`SELECT action FROM audit_log WHERE entity_id = ? ORDER BY id DESC`).get(b.id).action, /documents_not_needed/);
 });
 
 test('admin can delete a shipment', async () => {

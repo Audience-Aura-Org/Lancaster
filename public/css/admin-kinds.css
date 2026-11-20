@@ -43,3 +43,10 @@ a.pager-btn:hover, a.pager-num:hover { border-color: var(--brand); color: var(--
   .pager-bar { justify-content: center; text-align: center; }
   .pager-btn { padding: 0 10px; }
 }
+
+/* "No documents needed" */
+.docs-none { display: inline-flex; align-items: center; gap: 10px; margin: 2px 0 12px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; cursor: pointer; font-size: 14px; }
+.docs-none input { width: 18px; height: 18px; accent-color: var(--brand); }
+[data-docs-area].is-off { opacity: .4; pointer-events: none; }
+.docs-none-note { display: flex; gap: 10px; align-items: flex-start; padding: 14px; margin-bottom: 8px; border-radius: 10px; background: #e8f6ee; color: #155d39; font-size: 14px; }
+.docs-none-note i { margin-top: 3px; }

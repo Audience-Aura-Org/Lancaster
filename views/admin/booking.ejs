@@ -76,7 +76,7 @@
       <form method="post" action="/admin/bookings/<%= booking.id %>/documents">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="hidden" name="checklist" value="1">
-        <% if (!documents.length) { %><div class="empty" style="padding:16px">No documents needed for this shipment. Add one below.</div><% } %>
+        <% if (!documents.length) { %><div class="docs-none-note"><i class="fa-solid fa-circle-check"></i> <span><strong>No documents needed</strong> for this shipment. If that changes, add documents below or restore the standard list.</span></div><% } %>
         <% documents.forEach((d) => { %>
           <div class="doc-row">
             <label class="doc-check"><input type="checkbox" name="received" value="<%= d.id %>" <%= d.received ? 'checked' : '' %>><span><%= d.label %><% if (d.doc_key.startsWith('custom_')) { %> <em class="muted" style="font-size:12px">(added)</em><% } %><% if (d.received_at) { %><small>Received <%= d.received_at %> UTC</small><% } %></span></label>
@@ -105,6 +105,12 @@
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <button class="btn btn-outline btn-sm" type="submit" <%= documents.every((d) => d.received) ? 'disabled' : '' %>><i class="fa-solid fa-bell"></i> Email documents reminder</button>
         </form>
+        <% if (documents.length) { %>
+        <form method="post" action="/admin/bookings/<%= booking.id %>/documents/none" class="inline-form" data-confirm="Mark this shipment as needing no documents? This removes all <%= documents.length %> documents from the checklist.">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn-outline btn-sm" type="submit"><i class="fa-solid fa-ban"></i> No documents needed</button>
+        </form>
+        <% } %>
         <% if (missingStandard) { %>
         <form method="post" action="/admin/bookings/<%= booking.id %>/documents/restore" class="inline-form">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">

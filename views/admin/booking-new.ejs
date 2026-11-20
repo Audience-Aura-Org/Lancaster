@@ -27,6 +27,8 @@
 
   <h2 style="margin-top:24px"><i class="fa-solid fa-file-medical"></i> Documents needed</h2>
   <input type="hidden" name="docs_present" value="1">
+  <%- include('_docs-none') %>
+  <div data-docs-area>
   <p class="muted" data-docs-hint style="font-size:13px;<%= values.service_type ? 'display:none' : '' %>">Choose a service above to see the documents for that type of shipment.</p>
   <% Object.entries(domain.SERVICE_TYPES).filter(([, s]) => s.category === kind).forEach(([svc]) => { %>
     <div data-docs-for="<%= svc %>" <%= values.service_type === svc ? '' : 'hidden' %>>
@@ -36,6 +38,7 @@
   <div class="field" style="margin-top:10px">
     <label for="docs_custom">Other documents (one per line)</label>
     <textarea id="docs_custom" name="docs_custom" rows="2" maxlength="2000" style="min-height:64px" placeholder="e.g. Letter from destination employer"></textarea>
+  </div>
   </div>
   <label class="check" style="margin-top:18px"><input type="checkbox" name="notify" checked> Email the customer a booking confirmation with their document checklist</label>
   <div class="form-actions"><button class="btn btn-primary" type="submit">Create <%= kind === 'pet' ? 'pet booking' : 'item shipment' %></button></div>

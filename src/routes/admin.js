@@ -143,6 +143,14 @@ function idParam(req) {
 
 function notFound() { const e = new Error('Not found'); e.status = 404; return e; }
 
+/** The service a new form opens with: the one asked for (if it fits the kind), else the first of that kind. */
+function defaultService(kind, asked) {
+  if (!kind) return '';
+  if (asked && SERVICE_TYPES[asked] && SERVICE_TYPES[asked].category === kind) return asked;
+  const first = Object.entries(SERVICE_TYPES).find(([, x]) => x.category === kind);
+  return first ? first[0] : '';
+}
+
 /** Split a textarea of "one per line" document names into unique, non-empty labels. */
 function customDocLabels(text) {
   const seen = new Set();
@@ -157,6 +165,7 @@ function customDocLabels(text) {
  */
 function chosenDocuments(body, serviceType) {
   if (body.docs_present !== '1') return undefined;
+  if (body.docs_none === 'on') return [];
   const picked = resolveDocuments(serviceType, [].concat(body[`docs_${serviceType}`] || []));
   const have = new Set(picked.map(([, l]) => l.toLowerCase()));
   const custom = customDocLabels(body.docs_custom).filter((l) => !have.has(l.toLowerCase()))
@@ -185,7 +194,7 @@ router.get('/quotes', (req, res) => {
 
 router.get('/quotes/new', (req, res) => {
   const kind = kindFrom({}, req.query);
-  res.render('admin/quote-new', { title: 'New quote request', kind, values: { pet_count: 1 }, errors: {} });
+  res.render('admin/quote-new', { title: 'New quote request', kind, values: { pet_count: 1, service_type: defaultService(kind, req.query.service) }, errors: {} });
 });
 
 router.post('/quotes/new', async (req, res, next) => {
@@ -312,7 +321,7 @@ function readCustomer(b) {
 
 router.get('/bookings/new', (req, res) => {
   const kind = kindFrom({}, req.query);
-  res.render('admin/booking-new', { title: 'New booking', kind, values: { pet_count: 1 }, errors: {} });
+  res.render('admin/booking-new', { title: 'New booking', kind, values: { pet_count: 1, service_type: defaultService(kind, req.query.service) }, errors: {} });
 });
 
 router.post('/bookings/new', async (req, res, next) => {
@@ -480,6 +489,14 @@ router.post('/bookings/:id/documents/:docId/delete', (req, res) => {
     audit(req, 'document_removed', 'booking', id, doc.label);
     req.flash('success', `Removed "${doc.label}" from the checklist.`);
   }
+  res.redirect(docsPage(id));
+});
+
+router.post('/bookings/:id/documents/none', (req, res) => {
+  const { id } = bookingOr404(req);
+  const removed = db.get().prepare('DELETE FROM booking_documents WHERE booking_id = ?').run(id).changes;
+  audit(req, 'documents_not_needed', 'booking', id, `${removed} document(s) removed`);
+  req.flash('success', 'Marked as "no documents needed". The checklist is now empty.');
   res.redirect(docsPage(id));
 });
 

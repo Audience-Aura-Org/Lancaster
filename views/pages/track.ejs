@@ -158,6 +158,12 @@
           <% } %>
         </div>
         <% } %>
+        <% if (!documents.length && !cancelled) { %>
+        <div class="blk">
+          <h5><i class="fas fa-file-lines"></i> Documents</h5>
+          <p style="margin:0;font-size:13px"><i class="fas fa-circle-check" style="color:var(--ok)"></i> No documents needed for this shipment.</p>
+        </div>
+        <% } %>
         <% if (documents.length && !cancelled) { %>
         <div class="blk">
           <h5><i class="fas fa-file-lines"></i> Document checklist</h5>

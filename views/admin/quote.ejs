@@ -76,7 +76,10 @@
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
           <input type="hidden" name="docs_present" value="1">
           <div class="doc-add-title">Documents the customer will need</div>
+          <%- include('_docs-none') %>
+          <div data-docs-area>
           <%- include('_doc-picker', { pickService: quote.service_type, pickName: 'docs_' + quote.service_type, pickPreselect: true, pickExclude: [], pickCustom: 'docs_custom' }) %>
+          </div>
           <label class="check" style="margin:14px 0 12px"><input type="checkbox" name="notify" checked> Email booking confirmation and document checklist</label>
           <button class="btn btn-primary btn-sm btn-block" type="submit"><i class="fa-solid fa-suitcase-rolling"></i> Convert to booking</button>
         </form>
