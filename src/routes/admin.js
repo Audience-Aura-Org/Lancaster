@@ -3,6 +3,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
 const db = require('../db');
+const config = require('../config');
 const v = require('../validate');
 const svc = require('../services');
 const dashboard = require('../dashboard');
@@ -10,6 +11,7 @@ const { readShipment } = require('../shipment-form');
 const awb = require('../awb');
 const { requireAdmin, requireOwner, audit } = require('../security');
 const tpl = require('../emails/templates');
+const sampleData = require('../sample-data');
 const { SERVICE_TYPES, PET_TYPES, QUOTE_STATUSES, BOOKING_STATUSES, DOCUMENTS, PACKAGE_TYPES, resolveDocuments, isFreight, isAir, CARGO, parseKind, PAYMENT_METHODS, paymentSummary } = require('../domain');
 
 const router = express.Router();
@@ -81,7 +83,27 @@ router.use((req, res, next) => {
 /* ------------------------------------------------------------- dashboard */
 
 router.get('/', (req, res) => {
-  res.render('admin/dashboard', { title: 'Dashboard', ...dashboard.getDashboard() });
+  res.render('admin/dashboard', { title: 'Dashboard', ...dashboard.getDashboard(), sampleCount: sampleData.count() });
+});
+
+/* Sample data (owner only): try the admin and Track page without real customers. No emails are sent. */
+router.post('/samples/add', requireOwner, async (req, res, next) => {
+  try {
+    const r = await sampleData.add();
+    if (r.exists) req.flash('error', 'Sample data is already loaded.');
+    else {
+      audit(req, 'samples_added', null, null, `${r.added} bookings, ${r.quotes} quotes`);
+      req.flash('success', `Added ${r.added} sample bookings and ${r.quotes} sample quote requests. No emails were sent.`);
+    }
+    res.redirect('/admin');
+  } catch (e) { next(e); }
+});
+
+router.post('/samples/remove', requireOwner, (req, res) => {
+  const n = sampleData.remove();
+  if (n) audit(req, 'samples_removed', null, null, `${n} sample customers`);
+  req.flash('success', n ? 'Sample data removed. Your real bookings were not touched.' : 'There was no sample data to remove.');
+  res.redirect('/admin');
 });
 
 /** Search everything: bookings, quotes, customers. An exact tracking number jumps straight to it. */
@@ -743,7 +765,26 @@ router.get('/emails', (req, res) => {
   const d = db.get();
   const total = d.prepare('SELECT COUNT(*) n FROM email_log').get().n;
   const rows = d.prepare('SELECT * FROM email_log ORDER BY id DESC LIMIT ? OFFSET ?').all(limit, offset);
-  res.render('admin/emails', { title: 'Email log', rows, ...pageInfo(req, total), filter: {} });
+  res.render('admin/emails', { title: 'Email log', rows, ...pageInfo(req, total), filter: {},
+    mailHost: config.smtp.host, mailFrom: config.smtp.from });
+});
+
+router.post('/emails/test', async (req, res, next) => {
+  try {
+    const mailer = require('../mailer');
+    const ok = await mailer.send({
+      to: req.admin.email, template: 'test',
+      subject: `Test email from ${config.business.name}`,
+      text: 'This is a test email from your website admin. If you can read this, email sending works.',
+      html: '<p style="font-family:Poppins,Arial,sans-serif;font-size:14px">This is a test email from your website admin. If you can read this, email sending works.</p>',
+    });
+    const last = db.get().prepare("SELECT status, error FROM email_log WHERE template = 'test' ORDER BY id DESC LIMIT 1").get();
+    if (!ok) req.flash('error', `Test email failed: ${last && last.error ? last.error : 'unknown error'}`);
+    else if (last && last.status === 'saved_to_outbox') req.flash('error', 'Email settings are missing on this server, so the test email was only saved, not sent.');
+    else req.flash('success', `Test email sent to ${req.admin.email}. Check the inbox (and spam folder).`);
+    audit(req, 'email_test', null, null, last ? last.status : '');
+    res.redirect('/admin/emails');
+  } catch (e) { next(e); }
 });
 
 /* ------------------------------------------------------- account & users */

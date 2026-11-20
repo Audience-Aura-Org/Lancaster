@@ -11,6 +11,9 @@ process.env.DB_FILE = path.join(tmp, 'test.db');
 process.env.OUTBOX_DIR = path.join(tmp, 'outbox');
 process.env.SMTP_HOST = '';
 process.env.NOTIFY_EMAIL = 'staff@example.com';
+process.env.ADMIN_EMAIL = ''; // keep the local .env admin out of the test database
+process.env.ADMIN_PASSWORD = '';
+process.env.NODE_ENV = 'test';
 
 const bcrypt = require('bcryptjs');
 const db = require('../src/db');
@@ -831,4 +834,37 @@ test('ADMIN_EMAIL / ADMIN_PASSWORD give a working owner login on a fresh databas
   assert.equal(ensureAdmin({}), null);
   assert.equal(ensureAdmin({ ADMIN_EMAIL: 'x@example.com', ADMIN_PASSWORD: 'short' }), null);
   assert.equal(db.get().prepare(`SELECT COUNT(*) n FROM admins WHERE email = 'x@example.com'`).get().n, 0);
+});
+
+test('owner can add and remove sample data from the dashboard (no emails)', async () => {
+  const admin = await login();
+  const before = emails().length;
+  let page = await admin.get('/admin');
+  assert.match(page.text, /Add sample data/);
+  let r = await admin.form('/admin', '/admin/samples/add', {});
+  assert.equal(r.location, '/admin');
+  const n = () => db.get().prepare(`SELECT COUNT(*) n FROM customers WHERE notes = 'SAMPLE DATA'`).get().n;
+  assert.equal(n(), 14);
+  assert.equal(emails().length, before, 'no emails sent for samples');
+  assert.ok(db.get().prepare(`SELECT COUNT(*) n FROM payments WHERE reference = 'SAMPLE'`).get().n >= 5, 'samples include payments');
+  page = await admin.get('/admin');
+  assert.match(page.text, /Remove sample data/);
+  // A second add does nothing
+  await admin.form('/admin', '/admin/samples/add', {});
+  assert.equal(n(), 14);
+  r = await admin.form('/admin', '/admin/samples/remove', {});
+  assert.equal(n(), 0);
+  assert.equal(db.get().prepare(`SELECT COUNT(*) n FROM payments WHERE reference = 'SAMPLE'`).get().n, 0);
+});
+
+test('admin warns when email is not set up and can send a test email', async () => {
+  const admin = await login();
+  assert.match((await admin.get('/admin')).text, /Emails are not being sent from this server/);
+  const page = await admin.get('/admin/emails');
+  assert.match(page.text, /SMTP_HOST=smtp\.titan\.email/);
+  const r = await admin.form('/admin/emails', '/admin/emails/test', {});
+  assert.equal(r.location, '/admin/emails');
+  const last = db.get().prepare("SELECT * FROM email_log WHERE template = 'test' ORDER BY id DESC").get();
+  assert.equal(last.status, 'saved_to_outbox');
+  assert.match((await admin.get('/admin/emails')).text, /only saved, not sent/);
 });

@@ -1,5 +1,18 @@
 <%- include('_top') %>
-<div class="admin-head"><div><h1>Email log</h1><div class="sub">Every email the system has sent or tried to send. "saved to outbox" means SMTP isn't configured yet.</div></div></div>
+<div class="admin-head"><div><h1>Email log</h1><div class="sub">Every email the system has sent or tried to send. "saved to outbox" means email settings are missing on this server; "failed" shows the reason underneath.</div></div></div>
+<section class="panel">
+  <% if (!mailConfigured) { %>
+    <div class="alert alert-error" style="margin-bottom:12px"><strong>Emails are not being sent.</strong> The email settings are missing on this server, so emails are only saved, not delivered.
+      Add these settings to the server's environment variables, then restart the app:
+      <code>SMTP_HOST=smtp.titan.email</code>, <code>SMTP_PORT=465</code>, <code>SMTP_SECURE=true</code>, <code>SMTP_USER=info@lancasterpetmovers.com</code>, <code>SMTP_PASS</code> (the mailbox password), <code>MAIL_FROM</code>.</div>
+  <% } else { %>
+    <p class="muted" style="margin:0 0 12px;font-size:14px"><i class="fa-solid fa-circle-check" style="color:#16a34a"></i> Email sending is set up (<%= mailHost %>, from <%= mailFrom %>).</p>
+  <% } %>
+  <form method="post" action="/admin/emails/test" class="inline-form" data-once>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button class="btn btn-outline btn-sm" type="submit"><i class="fa-solid fa-paper-plane"></i> Send a test email to <%= admin.email %></button>
+  </form>
+</section>
 <section class="panel table-wrap">
   <% if (!rows.length) { %><div class="empty">No emails yet.</div><% } else { %>
   <table class="table">

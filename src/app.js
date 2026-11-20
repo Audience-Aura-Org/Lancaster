@@ -69,6 +69,7 @@ function createApp() {
     res.locals.description = '';
     res.locals.admin = null;
     res.locals.tawkProperty = config.tawkProperty;
+    res.locals.mailConfigured = require('./mailer').isConfigured();
     next();
   });
   app.use(flash);

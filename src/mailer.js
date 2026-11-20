@@ -15,6 +15,7 @@ function getTransport() {
       port: config.smtp.port,
       secure: config.smtp.secure,
       auth: config.smtp.user ? { user: config.smtp.user, pass: config.smtp.pass } : undefined,
+      connectionTimeout: 15000, greetingTimeout: 15000, socketTimeout: 30000,
     });
   } else {
     // No SMTP configured: write each message as an .eml file to data/outbox for review.
@@ -60,4 +61,7 @@ async function send({ to, subject, html, text, template, bookingId = null, quote
 /** For tests. */
 function _reset() { transport = undefined; }
 
-module.exports = { send, _reset };
+/** Is real email sending set up (SMTP_HOST, SMTP_USER and SMTP_PASS)? */
+function isConfigured() { return Boolean(config.smtp.host && config.smtp.user && config.smtp.pass); }
+
+module.exports = { send, isConfigured, _reset };

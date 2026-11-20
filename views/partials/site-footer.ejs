@@ -1,40 +1,75 @@
 <%# Shared footer for every public page. %>
-<% const _footServices = Object.values(domain.SERVICE_TYPES).filter((s) => s.category === 'pet' && !s.retired); %>
-<footer class="main-footer"><div class="mega-footer"><div class="container"><div class="row">
-  <div class="col-lg-4 col-md-6 col-12"><div class="footer-about">
-    <div class="footer-heading"><figure><span class="brand-mark brand-mark-footer"><span class="brand-initials" aria-hidden="true"><i class="fa-solid fa-paw"></i></span><span class="brand-name">Lancaster <small>Pet Movers</small></span></span></figure></div>
-    <div class="footer-content"><p>Safe, caring pet transport by road and air, across the country and around the world. Every pet travels like family.</p></div>
-    <div class="footer-social-link"><ul>
-      <li><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
-      <li><a href="#" aria-label="X"><i class="fa-brands fa-twitter"></i></a></li>
-      <li><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
-    </ul></div>
-  </div></div>
+<% const _footServices = [
+  ['/pet-transport.html', 'All pet services'],
+  ['/pet-ground-transport.html', 'Ground transport'],
+  ['/pet-air-travel.html', 'Domestic pet flights'],
+  ['/international-pet-relocation.html', 'International moves'],
+]; %>
+<footer class="lpm-foot">
+  <div class="container">
+    <div class="lpm-foot-cta">
+      <div>
+        <h2>Moving with a pet?</h2>
+        <p>Tell us where they're going. We'll reply with a clear plan and price.</p>
+      </div>
+      <div class="lpm-foot-cta-btns">
+        <a class="lpm-foot-btn lpm-foot-btn-primary" href="/quote">Get a free quote</a>
+        <a class="lpm-foot-btn lpm-foot-btn-ghost" href="/track">Track my pet</a>
+      </div>
+    </div>
 
-  <div class="col-lg-2 col-md-6 col-6"><div class="footer-links"><div class="footer-info-heading"><h2>Company</h2></div><ul>
-    <li><a href="/">Home</a></li>
-    <li><a href="/about-us.html">About Us</a></li>
-    <li><a href="/reviews.html">Reviews</a></li>
-    <li><a href="/locations.html">Where we travel</a></li>
-    <li><a href="/faqs.html">FAQs</a></li>
-    <li><a href="/contact.html">Contact</a></li>
-  </ul></div></div>
+    <div class="lpm-foot-grid">
+      <div class="lpm-foot-brand">
+        <a href="/" class="brand-mark brand-mark-footer" aria-label="<%= business.name %> home"><span class="brand-initials" aria-hidden="true"><i class="fa-solid fa-paw"></i></span><span class="brand-name">Lancaster <small>Pet Movers</small></span></a>
+        <p>Safe, caring pet transport by road and air, across the country and around the world. Every pet travels like family.</p>
+        <ul class="lpm-foot-contact">
+          <li><a href="mailto:<%= business.email %>"><i class="fa-regular fa-envelope" aria-hidden="true"></i><%= business.email %></a></li>
+          <% if (business.phone) { %><li><a href="tel:<%= business.phone.replace(/[^\d+]/g, '') %>"><i class="fa-solid fa-phone" aria-hidden="true"></i><%= business.phone %></a></li><% } %>
+          <li><span><i class="fa-solid fa-location-dot" aria-hidden="true"></i><%= business.address %></span></li>
+        </ul>
+      </div>
 
-  <div class="col-lg-3 col-md-6 col-6"><div class="footer-links"><div class="footer-info-heading"><h2>Pet Services</h2></div><ul>
-    <li><a href="/pet-transport.html">Pet Transport Overview</a></li>
-    <% _footServices.forEach((s) => { %><li><a href="/<%= s.slug %>.html"><%= s.label %></a></li><% }) %>
-    <li><a href="/quote">Get a free quote</a></li>
-    <li><a href="/track">Track my pet</a></li>
-  </ul></div></div>
+      <nav class="lpm-foot-col" aria-label="Company">
+        <h3>Company</h3>
+        <ul>
+          <li><a href="/about-us.html">About us</a></li>
+          <li><a href="/reviews.html">Reviews</a></li>
+          <li><a href="/locations.html">Where we travel</a></li>
+          <li><a href="/faqs.html">FAQs</a></li>
+          <li><a href="/contact.html">Contact</a></li>
+        </ul>
+      </nav>
 
-  <div class="col-lg-3 col-md-6 col-12">
-    <div class="footer-info-heading"><h2>Pet Travel Tips</h2></div>
-    <div class="newsletters-content"><p>Practical advice for moving with pets, plus service updates. No spam.</p></div>
-    <div class="newsletters-form"><form action="/subscribe" method="post" class="mail-box"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><div class="row no-gutters"><div class="form-group col-11"><input type="email" name="email" class="form-control" aria-label="Email address" placeholder="Your email address" required></div><div class="col-1"><button type="submit" aria-label="Subscribe"><i class="fas fa-paper-plane"></i></button></div></div></form></div>
-    <div class="footer-contact-line"><a href="mailto:<%= business.email %>"><i class="fa-regular fa-envelope"></i> <%= business.email %></a><% if (business.phone) { %><a href="tel:<%= business.phone.replace(/[^\d+]/g, '') %>"><i class="fa-solid fa-phone"></i> <%= business.phone %></a><% } %></div>
+      <nav class="lpm-foot-col" aria-label="Pet services">
+        <h3>Pet services</h3>
+        <ul>
+          <% _footServices.forEach(([href, text]) => { %><li><a href="<%= href %>"><%= text %></a></li><% }) %>
+        </ul>
+      </nav>
+
+      <div class="lpm-foot-news">
+        <h3>Pet travel tips</h3>
+        <p>Practical advice for moving with pets. No spam.</p>
+        <form action="/subscribe" method="post" class="lpm-foot-form">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <label for="foot-email" class="lpm-sr">Email address</label>
+          <input id="foot-email" type="email" name="email" placeholder="Your email" autocomplete="email" required>
+          <button type="submit">Subscribe</button>
+        </form>
+        <ul class="lpm-foot-social">
+          <li><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a></li>
+          <li><a href="#" aria-label="X"><i class="fa-brands fa-twitter"></i></a></li>
+          <li><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="lpm-foot-bottom">
+      <p>&copy; <%= year %> <%= business.name %>. All rights reserved.</p>
+      <ul>
+        <li><a href="/privacy-policy.html">Privacy policy</a></li>
+        <li><a href="/terms-of-service.html">Terms of service</a></li>
+      </ul>
+    </div>
   </div>
-</div></div></div></footer>
-<div class="footer-copyright-links"><div class="container"><div class="row align-items-center">
-  <div class="col-lg-7 col-md-7 col-12"><div class="footer-copyright"><p>Copyright <%= year %> <b><%= business.name %>.</b> All rights reserved.</p></div></div>
-  <div class="col-lg-5 col-md-5 col-12"><div class="footer-policy-links"><ul><li><a href="/privacy-policy.html">Privacy Policy</a></li><li><a href="/terms-of-service.html">Terms of Service</a></li></ul></div></div>
-</div></div></div>
+</footer>

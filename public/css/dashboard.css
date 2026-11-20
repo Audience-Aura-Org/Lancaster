@@ -59,3 +59,25 @@
 .mini-list .muted { font-size: 13px; }
 .dash-empty { display: flex; gap: 14px; align-items: center; padding: 10px 2px; }
 .dash-empty > i { font-size: 22px; color: var(--muted); }
+
+/* Phones: slimmer search bar on its own row, compact New booking button */
+@media (max-width: 640px) {
+  .dash-head { margin-bottom: 20px; gap: 14px; }
+  .dash-head h1 { font-size: 24px; }
+  .dash-tools { flex: 1 1 100%; max-width: none; gap: 8px; }
+  .dash-search i { left: 13px; font-size: 13px; }
+  .dash-search input { min-height: 40px; height: 40px; padding: 6px 12px 6px 34px; }
+  .dash-tools .btn { min-height: 40px; padding: 0 14px; font-size: 13px; }
+}
+@media (max-width: 640px) and (hover: none) and (pointer: coarse) {
+  /* admin pages set maximum-scale=1, so a smaller font here does not zoom on focus */
+  .dash-search input { font-size: 16px !important; }
+  .dash-search input::placeholder { font-size: 15px; }
+}
+
+/* Sample data strip (owners) */
+.dash-sample { display: flex; align-items: center; justify-content: space-between; gap: 14px 20px; flex-wrap: wrap;
+  margin-top: 22px; padding: 14px 18px; border: 1px dashed var(--line); border-radius: 14px; background: #fff; font-size: 13px; color: var(--muted); }
+.dash-sample strong { display: block; color: var(--ink); font-size: 14px; margin-bottom: 2px; }
+.dash-sample strong i { color: var(--muted); margin-right: 4px; }
+.dash-sample form { margin: 0; }

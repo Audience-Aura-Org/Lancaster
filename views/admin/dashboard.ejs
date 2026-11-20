@@ -19,6 +19,9 @@
   </div>
 </header>
 
+<% if (!mailConfigured) { %>
+<div class="alert alert-error" style="margin-bottom:18px"><i class="fa-solid fa-triangle-exclamation"></i> <strong>Emails are not being sent from this server.</strong> Quote and booking emails are only saved. <a href="/admin/emails">See how to fix it</a>.</div>
+<% } %>
 <div class="dash-stats">
   <a href="/admin/bookings"><span><%= stats.active %></span>Active shipments</a>
   <a href="#coming-up"><span><%= stats.departingWeek %></span>Departing this week</a>
@@ -63,4 +66,24 @@
     <% } %>
   </section>
 </div>
+
+<% if (admin.role === 'owner') { %>
+<section class="dash-sample">
+  <div>
+    <strong><i class="fa-solid fa-flask" aria-hidden="true"></i> Sample data</strong>
+    <span><%= sampleCount ? 'Sample bookings and quotes are loaded (customers @example.com). Remove them before going live.' : 'Load example bookings, quotes and payments to try the admin and Track page. No emails are sent.' %></span>
+  </div>
+  <% if (sampleCount) { %>
+  <form method="post" action="/admin/samples/remove" data-once data-confirm="Remove all sample bookings, quotes and customers? Real bookings are not touched.">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button class="btn btn-outline btn-sm" type="submit"><i class="fa-solid fa-trash"></i> Remove sample data</button>
+  </form>
+  <% } else { %>
+  <form method="post" action="/admin/samples/add" data-once>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button class="btn btn-outline btn-sm" type="submit"><i class="fa-solid fa-plus"></i> Add sample data</button>
+  </form>
+  <% } %>
+</section>
+<% } %>
 <%- include('_bottom') %>
