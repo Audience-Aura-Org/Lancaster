@@ -201,21 +201,15 @@ function documentOptions(serviceType) {
   const svc = SERVICE_TYPES[serviceType];
   const cat = svc ? svc.category : 'pet';
   const seen = new Set();
-  const take = (items, std, prefix = '') => items
-    .map(([k, l]) => [prefix + k, l, std])
-    .filter(([, l]) => { const id = l.toLowerCase(); if (seen.has(id)) return false; seen.add(id); return true; });
-  const other = cat === 'pet' ? 'freight' : 'pet';
-  // Standard documents of the other services in the same category are useful extras too.
+  const unique = (items) => items.filter(([, l]) => { const id = l.toLowerCase(); if (seen.has(id)) return false; seen.add(id); return true; });
+  // Pets only ever see pet documents and items only item documents: the extras come from
+  // the same category (its library + the other services' standard lists), never the other one.
   const sameCatStd = Object.entries(SERVICE_TYPES).filter(([k, s]) => s.category === cat && k !== serviceType)
-    .flatMap(([k]) => (DOCUMENTS[k] || []).map(([dk, l]) => [`${k}__${dk}`, l]));
-  const otherCatStd = Object.entries(SERVICE_TYPES).filter(([, s]) => s.category === other)
-    .flatMap(([k]) => (DOCUMENTS[k] || []).map(([dk, l]) => [`${k}__${dk}`, l]));
+    .flatMap(([k]) => (DOCUMENTS[k] || []).map(([dk, l]) => [`${k}__${dk}`, l, false]));
   return [
-    { title: `Standard for ${svc ? svc.label : 'this service'}`, items: take(DOCUMENTS[serviceType] || [], true) },
-    { title: cat === 'pet' ? 'Other pet travel documents' : 'Other freight documents',
-      items: take([...EXTRA_DOCUMENTS[cat], ...sameCatStd.map(([k, l]) => [k, l])], false, '') .map(([k, l, s]) => [k.includes('__') ? k : `lib_${k}`, l, s]) },
-    { title: cat === 'pet' ? 'Freight documents' : 'Pet travel documents',
-      items: take([...EXTRA_DOCUMENTS[other], ...otherCatStd], false, '').map(([k, l, s]) => [k.includes('__') ? k : `lib_${k}`, l, s]) },
+    { title: `Standard for ${svc ? svc.label : 'this service'}`, items: unique((DOCUMENTS[serviceType] || []).map(([k, l]) => [k, l, true])) },
+    { title: cat === 'pet' ? 'Other pet travel documents' : 'Other item shipping documents',
+      items: unique([...EXTRA_DOCUMENTS[cat].map(([k, l]) => [`lib_${k}`, l, false]), ...sameCatStd]) },
   ].filter((g) => g.items.length);
 }
 

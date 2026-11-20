@@ -689,6 +689,32 @@ test('new forms show pre-selected documents and allow "no documents needed"', as
   assert.match(db.get().prepare(`SELECT action FROM audit_log WHERE entity_id = ? ORDER BY id DESC`).get(b.id).action, /documents_not_needed/);
 });
 
+test('pet shipments never get item documents and vice versa', async () => {
+  const admin = await login();
+  const tok = (h) => h.match(/name="_csrf" value="([^"]+)"/)[1];
+  // Forms only list the right kind
+  let html = (await admin.get('/admin/bookings/new?type=pet')).text;
+  assert.doesNotMatch(html, /Bill of lading|Commercial invoice|Freight documents|lib_bill_of_lading/);
+  assert.match(html, /Pet passport/);
+  html = (await admin.get('/admin/bookings/new?type=item')).text;
+  assert.doesNotMatch(html, /Pet passport|rabies|Pet travel documents|lib_pet_passport/i);
+  assert.match(html, /Bill of lading/);
+
+  // Server ignores documents of the other kind even if they are posted
+  r = await admin.post('/admin/bookings/new', { _csrf: tok(html), kind: 'pet', docs_present: '1',
+    docs_domestic_air: ['rabies', 'lib_bill_of_lading', 'ocean_freight__invoice'],
+    name: 'Cross', email: 'cross@example.com', service_type: 'domestic_air', pet_type: 'dog', origin: 'A', destination: 'B' });
+  var r;
+  const id = Number(r.location.split('/').pop());
+  const labels = () => db.get().prepare('SELECT label FROM booking_documents WHERE booking_id = ? ORDER BY id').all(id).map((d) => d.label);
+  assert.deepEqual(labels(), ['Current rabies vaccination certificate']);
+  // ...and on an existing booking's "Choose from the list"
+  html = (await admin.get(`/admin/bookings/${id}`)).text;
+  assert.doesNotMatch(html, /name="pick" value="lib_bill_of_lading"/);
+  await admin.post(`/admin/bookings/${id}/documents/add`, { _csrf: tok(html), pick: ['lib_bill_of_lading', 'lib_pet_passport'] });
+  assert.deepEqual(labels(), ['Current rabies vaccination certificate', 'Pet passport (EU / UK)']);
+});
+
 test('admin can delete a shipment', async () => {
   const admin = await login();
   // A booking made from a quote, with notes, documents, history and an email
